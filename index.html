@@ -70,7 +70,7 @@
 
         let currentMode = 'multi';
         let playerStates = {};
-        let globalState = { minQty: 1, maxQty: 99, isMuted: false, activePlayerIdForModal: null };
+        let globalState = { minQty: 1, maxQty: 32, isMuted: false, activePlayerIdForModal: null };
         let historyData = [];
         let pressTimer = null;
 
@@ -100,7 +100,7 @@
             panel.id = `panel-${playerId}`;
             panel.className = `player-panel bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full`;
             const controlsHTML = `<div class="grid grid-cols-3 gap-2"><div class="bg-gray-700/80 rounded-xl flex items-center justify-center"><span class="font-bold text-lg">數量</span></div><div class="bg-gray-700/80 rounded-xl flex items-center justify-evenly p-1"><button data-action="decrease-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-${playerId}" class="text-2xl font-bold w-10 text-center">${state.quantity}</span><button data-action="increase-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div><button data-action="roll" data-player="${playerId}" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors flex items-center justify-center">骰出</button></div>`;
-            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-gray-400"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-white w-2/3 focus:outline-none focus:bg-gray-700/50 rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-action="open-modal" data-player="${playerId}" class="flex-grow bg-gray-900/50 rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center text-xs"><p class="font-bold">長按換骰</p></div></div><div class="text-center mb-2"><span class="text-gray-400 text-sm tracking-widest">骰子數字總合</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-amber-400 transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
+            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-gray-400"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-white w-2/3 focus:outline-none focus:bg-gray-700/50 rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-action="open-modal" data-player="${playerId}" class="flex-grow bg-gray-900/50 rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center text-2xl"><p class="font-bold">長按換骰</p></div></div><div class="text-center mb-2"><span class="text-gray-400 text-sm tracking-widest">骰子數字總合</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-amber-400 transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
             return panel;
         };
         const createHistoryPanel = () => {
@@ -121,22 +121,66 @@
         };
         const createSinglePlayerUI = () => {
              return `<div class="h-full flex w-full max-w-4xl mx-auto"><div class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative"><div class="flex justify-center items-center mb-2 text-gray-400 pt-8"><span>當前類型:</span><div id="current-die-icon-display-player1" class="w-7 h-7 ml-2"></div></div><div id="dice-area-player1" data-action="open-modal" data-player="player1" class="flex-grow bg-gray-900/50 rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center leading-relaxed"><p class="font-bold">長按此處更換骰子</p><p>點擊「骰出」開始</p></div></div><div class="text-center mb-4"><span class="text-gray-400 text-lg tracking-widest">骰子數字總合</span><p id="sum-display-player1" class="text-6xl font-black tracking-tighter text-amber-400 transition-all duration-300">0</p></div><div class="grid grid-cols-5 gap-4"><div class="bg-gray-700 rounded-xl flex items-center justify-between p-2 col-span-3"><span class="font-bold ml-3 text-lg">數量</span><div class="flex items-center gap-2"><button data-action="decrease-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-player1" class="text-2xl font-bold w-10 text-center">1</span><button data-action="increase-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div></div><button data-action="roll" data-player="player1" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors col-span-2 flex items-center justify-center">骰出</button></div></div><div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-gray-900/60 p-4 border-l-2 border-gray-700/50"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-gray-300">擲骰紀錄</h3><button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">清除</button></div><div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div><input type="text" data-action="change-name" data-player="player1" class="w-full bg-gray-800/80 border-2 border-gray-700 rounded-lg py-2 px-3 mt-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="輸入使用者名稱..."><button data-action="export-history" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">導出擲骰紀錄 (.txt)</button></div></div>`;
+           
+        
         };
         const createDocsUI = () => {
             return `
-                <div class="h-full w-full flex flex-col items-center space-y-4">
-                    <h2 class="text-2xl font-bold text-amber-300">說明文件</h2>
+            <div class="h-full w-full flex flex-col text-gray-300 p-4 space-y-6 text-base">
+                <h2 class="text-3xl font-black text-center text-amber-300">TRPG-骨灰級骰子工具</h2>
+                <p class="text-center text-lg">歡迎使用這款為桌遊與 TRPG 玩家打造的網頁骰子工具！操作直觀，無論您是城主、遊戲主持人 (GM) 還是玩家，都能透過骰子工具獲得擲骰體驗。</p>
+                
+                <div class="border-b border-gray-600 my-2"></div>
+
+                <h3 class="text-2xl font-bold text-amber-400">完整功能說明</h3>
+
+                <div>
+                    <h4 class="text-xl font-bold text-white mb-2">選單介面（左側控制欄）</h4>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>模式切換：</strong> 在「單人模式」、「多人模式」與「說明文件」之間切換應用程式的主要功能。</li>
+                        <li><strong>音效開關：</strong> 點擊喇叭圖示，可以在「開啟音效」與「靜音」之間切換音效。</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-bold text-white mb-2">單人模式</h4>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>核心功能：</strong> 提供一個大型的個人擲骰面板，包含骰子表演區、總和顯示與數量控制。</li>
+                        <li><strong>更換骰子類型：</strong> 在「骰子表演區」<strong>長按</strong>（按住約半秒），即可彈出選單來更換骰子類型（D4, D6, D8, D10, D12, D20）。</li>
+                        <li><strong>歷史紀錄：</strong> 畫面右側會顯示詳細的擲骰歷史，並可輸入玩家名稱。</li>
+                        <li><strong>導出紀錄：</strong> 可將右側的擲骰歷史紀錄打包成一個 <strong>.txt</strong> 文字檔下載。</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-bold text-white mb-2">多人模式</h4>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>5+1 面板佈局：</strong> 包含 5 個玩家面板（含 1 個 GM）和 1 個共用的歷史紀錄面板。</li>
+                        <li><strong>獨立控制：</strong> 每個玩家面板都有獨立的名稱、骰子類型、數量控制與擲骰按鈕。</li>
+                        <li><strong>存檔與讀檔：</strong>
+                            <ul class="list-['-_'] list-inside pl-6 space-y-1 mt-1">
+                                <li><strong>導出紀錄：</strong> 點擊此按鈕，會將當前所有玩家的面板設定（名稱、骰子類型、數量等）與完整的歷史紀錄，打包成一個 <strong>.txt</strong> 存檔。</li>
+                                <li><strong>導入紀錄：</strong> 點擊此按鈕並選擇之前導出的存檔，即可完整還原整個遊戲場面，包含所有玩家設定與歷史紀錄。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="border-b border-gray-600 my-2"></div>
+
+                <div class="w-full flex flex-col items-center space-y-4">
+                    <h2 class="text-2xl font-bold text-amber-300">說明圖片</h2>
                     <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
                         <img src="assets/Singleplayermode readme.png" alt="單人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Singleplayer+Mode+Readme.png';">
                     </div>
-                     <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
+                    <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
                         <img src="assets/Multiplayermode readme.png" alt="多人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Multiplayer+Mode+Readme.png';">
                     </div>
                 </div>
+            </div>
             `;
         };
-        
-        const updateUI = (playerId) => {
+            const updateUI = (playerId) => {
             const state = playerStates[playerId];
             if (!state) return;
             const qtyDisplay = document.getElementById(`quantity-display-${playerId}`);
