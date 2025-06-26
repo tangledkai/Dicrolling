@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRPG-Diceroller-V1.1.1</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
@@ -27,7 +25,6 @@
 </head>
 <body class="bg-gray-800 text-white select-none overflow-hidden h-screen flex">
 
-    <!-- 骰子類型選擇彈窗 (所有模式共用) -->
     <div id="dice-type-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4 transition-opacity duration-300">
         <div class="bg-gray-700 rounded-2xl p-6 shadow-2xl w-full max-w-xs">
             <h3 class="text-xl mb-6 text-center font-bold text-gray-200">選擇骰子類型</h3>
@@ -35,7 +32,6 @@
         </div>
     </div>
 
-    <!-- 左側控制欄 -->
     <div id="control-sidebar" class="w-48 bg-gray-900/60 p-4 flex flex-col">
         <h1 class="text-xl font-black text-center text-amber-300">骨灰級骰子工具</h1>
         <div class="flex-grow flex flex-col space-y-2 mt-4">
@@ -43,24 +39,24 @@
             <button id="multi-mode-btn" data-mode="multi" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">多人模式</button>
             <button id="docs-mode-btn" data-mode="docs" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">說明文件</button>
         </div>
-        <a href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mb-2 text-center text-xs text-gray-500 hover:text-amber-300 transition-colors no-underline">
+        <a href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mb-2 text-center text-base text-gray-500 hover:text-amber-300 transition-colors no-underline">
             tangledkai_2.0 製作
         </a>
         <button id="sound-toggle-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors">
-            <!-- 音效圖示會由 JS 插入 -->
+
         </button>
     </div>
 
-    <!-- 右側主內容區 -->
+
     <div id="main-content" class="flex-1 p-4">
-        <!-- 內容由 JS 動態生成 -->
+
     </div>
     
     <input type="file" id="import-file-input" class="hidden" accept=".txt,.json">
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- DOM 容器 ---
+
         const mainContentContainer = document.getElementById('main-content');
         const modal = document.getElementById('dice-type-modal');
         const diceTypeOptionsContainer = document.getElementById('dice-type-options');
@@ -71,14 +67,14 @@
         const importFileInput = document.getElementById('import-file-input');
         let historyLogContainer; 
 
-        // --- 核心狀態管理 ---
+
         let currentMode = 'multi';
         let playerStates = {};
         let globalState = { minQty: 1, maxQty: 99, isMuted: false, activePlayerIdForModal: null };
         let historyData = [];
         let pressTimer = null;
 
-        // --- 音效系統 ---
+
         const buttonSound = new Audio('assets/button001.mp3');
         const rollSoundFiles = ['assets/dice001.wav', 'assets/dice002.wav', 'assets/dice003.wav', 'assets/dice004.wav', 'assets/dice005.wav'];
         const rollSounds = rollSoundFiles.map(file => new Audio(file));
@@ -88,7 +84,7 @@
         const playRandomRollSound = () => playSound(rollSounds[Math.floor(Math.random() * rollSounds.length)]);
         const updateSoundToggleIcon = () => { soundToggleBtn.innerHTML = globalState.isMuted ? soundOffIcon : soundOnIcon; };
 
-        // --- 資源 ---
+
         const dieSVGs = {
             4: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 85H5L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
             6: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="90" rx="10" stroke="currentColor" stroke-width="5"/></svg>`,
