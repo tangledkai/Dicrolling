@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>diceroller(tangledkai_2.0)</title>
+    <title>TRPG-Diceroller-V1.1.1</title>
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Google Fonts -->
@@ -11,31 +11,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* 自訂樣式 */
-        body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        /* 骰子滾動動畫 */
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
         @keyframes roll-in {
-            0% { transform: scale(0.5) rotate(-180deg) translateY(-100px); opacity: 0; }
+            0% { transform: scale(0.5) rotate(-180deg) translateY(-50px); opacity: 0; }
             80% { transform: scale(1.1) rotate(10deg); opacity: 1; }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
-        .animate-roll-in {
-            animation: roll-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
+        .animate-roll-in { animation: roll-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         button, [role="button"], a { cursor: pointer; }
-        /* 客製化捲軸樣式 */
         .history-log::-webkit-scrollbar { width: 6px; }
         .history-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
         .history-log::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 10px; }
         .history-log::-webkit-scrollbar-thumb:hover { background: #718096; }
     </style>
 </head>
-<body class="bg-gray-800 text-white select-none overflow-hidden h-screen">
+<body class="bg-gray-800 text-white select-none overflow-hidden h-screen flex">
 
-    <!-- 骰子類型選擇彈窗 -->
+    <!-- 骰子類型選擇彈窗 (所有模式共用) -->
     <div id="dice-type-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4 transition-opacity duration-300">
         <div class="bg-gray-700 rounded-2xl p-6 shadow-2xl w-full max-w-xs">
             <h3 class="text-xl mb-6 text-center font-bold text-gray-200">選擇骰子類型</h3>
@@ -43,239 +35,395 @@
         </div>
     </div>
 
-    <!-- 整體佈局容器 -->
-    <div class="flex h-full w-full max-w-4xl mx-auto">
-        <!-- 左側主應用程式容器 -->
-        <div id="app-container" class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative">
-            <!-- 左上角音效開關 -->
-            <button id="sound-toggle-btn" class="absolute top-4 left-4 w-10 h-10 p-2 text-gray-400 hover:text-white transition-colors">
-                <!-- 音效圖示會由 JS 插入 -->
-            </button>
-            
-            <!-- 右上角製作者連結 -->
-            <a href="https://www.instagram.com/tangledkai_2.0/" target="_blank" rel="noopener noreferrer" class="absolute top-5 right-4 text-xs text-gray-500 hover:text-amber-300 transition-colors no-underline">
-                tangledkai_2.0 製作
-            </a>
-
-            <!-- 頂部資訊 -->
-            <div class="flex justify-center items-center mb-2 text-gray-400 pt-8">
-                <span>當前類型:</span>
-                <div id="current-die-icon-display" class="w-7 h-7 ml-2"></div>
-            </div>
-            <!-- 骰子表演區 -->
-            <div id="dice-area" class="flex-grow bg-gray-900/50 rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative">
-                <div id="instruction-text" class="text-gray-500 text-center leading-relaxed">
-                    <p class="font-bold">長按此處更換骰子</p>
-                    <p>點擊「骰出」開始</p>
-                </div>
-            </div>
-            <!-- 結果顯示區 -->
-            <div class="text-center mb-4">
-                <span class="text-gray-400 text-lg tracking-widest">骰子數字總合</span>
-                <p id="sum-display" class="text-6xl font-black tracking-tighter text-amber-400 transition-all duration-300">0</p>
-            </div>
-            <!-- 控制區 -->
-            <div class="grid grid-cols-5 gap-4">
-                <div class="bg-gray-700 rounded-xl flex items-center justify-between p-2 col-span-3">
-                    <span class="font-bold ml-3 text-lg">數量</span>
-                    <div class="flex items-center gap-2">
-                        <button id="decrease-qty" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button>
-                        <span id="quantity-display" class="text-2xl font-bold w-10 text-center">1</span>
-                        <button id="increase-qty" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button>
-                    </div>
-                </div>
-                <button id="roll-button" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors col-span-2 flex items-center justify-center">
-                    骰出
-                </button>
-            </div>
+    <!-- 左側控制欄 -->
+    <div id="control-sidebar" class="w-48 bg-gray-900/60 p-4 flex flex-col">
+        <h1 class="text-xl font-black text-center text-amber-300">骨灰級骰子工具</h1>
+        <div class="flex-grow flex flex-col space-y-2 mt-4">
+            <button id="single-mode-btn" data-mode="single" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">單人模式</button>
+            <button id="multi-mode-btn" data-mode="multi" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">多人模式</button>
+            <button id="docs-mode-btn" data-mode="docs" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">說明文件</button>
         </div>
-
-        <!-- 右側歷史紀錄容器 -->
-        <div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-gray-900/60 p-4 border-l-2 border-gray-700/50">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-300">擲骰紀錄</h3>
-                <button id="clear-history-btn" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">清除</button>
-            </div>
-            <div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div>
-            <!-- 使用者名稱輸入 -->
-            <input type="text" id="username-input" class="w-full bg-gray-800/80 border-2 border-gray-700 rounded-lg py-2 px-3 mt-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="輸入使用者名稱...">
-            <button id="export-history-btn" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">
-                導出擲骰紀錄 (.txt)
-            </button>
-        </div>
+        <a href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mb-2 text-center text-xs text-gray-500 hover:text-amber-300 transition-colors no-underline">
+            tangledkai_2.0 製作
+        </a>
+        <button id="sound-toggle-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors">
+            <!-- 音效圖示會由 JS 插入 -->
+        </button>
     </div>
 
+    <!-- 右側主內容區 -->
+    <div id="main-content" class="flex-1 p-4">
+        <!-- 內容由 JS 動態生成 -->
+    </div>
+    
+    <input type="file" id="import-file-input" class="hidden" accept=".txt,.json">
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM 元素 ---
-            const diceArea = document.getElementById('dice-area');
-            const sumDisplay = document.getElementById('sum-display');
-            const quantityDisplay = document.getElementById('quantity-display');
-            const decreaseQtyBtn = document.getElementById('decrease-qty');
-            const increaseQtyBtn = document.getElementById('increase-qty');
-            const rollButton = document.getElementById('roll-button');
-            const instructionText = document.getElementById('instruction-text');
-            const modal = document.getElementById('dice-type-modal');
-            const diceTypeOptionsContainer = document.getElementById('dice-type-options');
-            const currentDieIconDisplay = document.getElementById('current-die-icon-display');
-            const historyLogContainer = document.getElementById('history-log');
-            const clearHistoryBtn = document.getElementById('clear-history-btn');
-            const soundToggleBtn = document.getElementById('sound-toggle-btn');
-            const exportHistoryBtn = document.getElementById('export-history-btn');
-            const usernameInput = document.getElementById('username-input');
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM 容器 ---
+        const mainContentContainer = document.getElementById('main-content');
+        const modal = document.getElementById('dice-type-modal');
+        const diceTypeOptionsContainer = document.getElementById('dice-type-options');
+        const singleModeBtn = document.getElementById('single-mode-btn');
+        const multiModeBtn = document.getElementById('multi-mode-btn');
+        const docsModeBtn = document.getElementById('docs-mode-btn');
+        const soundToggleBtn = document.getElementById('sound-toggle-btn');
+        const importFileInput = document.getElementById('import-file-input');
+        let historyLogContainer; 
 
-            // --- 應用程式狀態 ---
-            let state = { 
-                dieType: 6, 
-                quantity: 1, 
-                minQty: 1, 
-                maxQty: 20, 
-                isMuted: false,
-                username: '玩家' // 新增使用者名稱狀態
-            };
-            let historyData = [];
+        // --- 核心狀態管理 ---
+        let currentMode = 'multi';
+        let playerStates = {};
+        let globalState = { minQty: 1, maxQty: 99, isMuted: false, activePlayerIdForModal: null };
+        let historyData = [];
+        let pressTimer = null;
 
-            // --- 音效與圖示資源 ---
-            const buttonSound = new Audio('assets/button001.mp3');
-            const rollSoundFiles = ['assets/dice001.wav', 'assets/dice002.wav', 'assets/dice003.wav', 'assets/dice004.wav', 'assets/dice005.wav'];
-            const rollSounds = rollSoundFiles.map(file => new Audio(file));
-            buttonSound.preload = 'auto';
-            rollSounds.forEach(sound => sound.preload = 'auto');
-            const soundOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
-            const soundOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
+        // --- 音效系統 ---
+        const buttonSound = new Audio('assets/button001.mp3');
+        const rollSoundFiles = ['assets/dice001.wav', 'assets/dice002.wav', 'assets/dice003.wav', 'assets/dice004.wav', 'assets/dice005.wav'];
+        const rollSounds = rollSoundFiles.map(file => new Audio(file));
+        const soundOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
+        const soundOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
+        const playSound = (audio) => { if (!globalState.isMuted) { audio.currentTime = 0; audio.play().catch(e=>console.warn("音效播放失敗", e)); } };
+        const playRandomRollSound = () => playSound(rollSounds[Math.floor(Math.random() * rollSounds.length)]);
+        const updateSoundToggleIcon = () => { soundToggleBtn.innerHTML = globalState.isMuted ? soundOffIcon : soundOnIcon; };
 
-            // --- 骰子 SVG 圖示資料 ---
-            const dieSVGs = {
-                4: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 85H5L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-                6: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="90" rx="10" stroke="currentColor" stroke-width="5"/></svg>`,
-                8: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 50L50 95L5 50L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-                10: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 40V60L50 95L5 60V40L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-                12: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L85.36 25L95 60L50 95L5 60L14.64 25L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-                20: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L90 35V65L50 95L10 65V35L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-            };
-            
-            let pressTimer = null;
+        // --- 資源 ---
+        const dieSVGs = {
+            4: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 85H5L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+            6: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="90" rx="10" stroke="currentColor" stroke-width="5"/></svg>`,
+            8: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 50L50 95L5 50L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+            10: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 40V60L50 95L5 60V40L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+            12: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L85.36 25L95 60L50 95L5 60L14.64 25L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+            20: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L90 35V65L50 95L10 65V35L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+        };
 
-            // --- 函式 ---
-            const playSound = (audioElement) => { if (state.isMuted) return; audioElement.currentTime = 0; audioElement.play().catch(error => console.warn("音效播放被瀏覽器阻止。", error)); };
-            const playRandomRollSound = () => { if (state.isMuted) return; const randomSound = rollSounds[Math.floor(Math.random() * rollSounds.length)]; playSound(randomSound); };
-            const updateSoundToggleIcon = () => { soundToggleBtn.innerHTML = state.isMuted ? soundOffIcon : soundOnIcon; };
-            const updateUI = () => { quantityDisplay.textContent = state.quantity; currentDieIconDisplay.innerHTML = dieSVGs[state.dieType]; };
-
-            const createDieElement = (value, type) => {
-                const dieFace = document.createElement('div');
-                dieFace.className = 'w-16 h-16 sm:w-20 sm:h-20 bg-gray-700 rounded-lg flex items-center justify-center shadow-lg relative animate-roll-in';
-                const svgIcon = document.createElement('div');
-                svgIcon.className = 'absolute inset-0 text-gray-400 opacity-30 p-1';
-                svgIcon.innerHTML = dieSVGs[type];
-                const numberText = document.createElement('span');
-                numberText.className = 'text-3xl font-bold z-10';
-                numberText.textContent = value;
-                if(type === 20) { if (value === 20) numberText.classList.add('text-green-400'); if (value === 1) numberText.classList.add('text-red-500'); }
-                dieFace.appendChild(svgIcon); dieFace.appendChild(numberText);
-                return dieFace;
-            };
-
-            const addHistoryEntry = (total, diceResults, dieType, qty) => {
-                if (!historyLogContainer) return;
-                const username = state.username.trim() || '玩家'; // 如果使用者名稱為空，則使用預設值
-                const diceInfo = `${qty}d${dieType}`;
-                const resultString = `[${diceResults.join(', ')}]`;
-                
-                // 產生用於導出 TXT 的文字紀錄
-                const logText = `【${username}_${diceInfo}】: ${total} → ${resultString}`;
-                historyData.push(logText);
-
-                // 產生用於顯示在介面上的 HTML
-                const entry = document.createElement('div');
-                entry.className = 'bg-gray-800/80 p-3 rounded-lg text-sm';
-                entry.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1 mr-2">
-                             <p class="font-bold break-words">
-                                <span class="text-white">${username}</span>
-                                <span class="text-amber-300"> 擲出 ${diceInfo}</span>
-                            </p>
-                            <p class="text-gray-400 mt-1 text-xs break-all">${resultString}</p>
-                        </div>
-                        <span class="text-3xl font-bold">${total}</span>
+        const createPlayerPanel = (playerId) => {
+            const state = playerStates[playerId];
+            const panel = document.createElement('div');
+            panel.id = `panel-${playerId}`;
+            panel.className = `player-panel bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full`;
+            const controlsHTML = `<div class="grid grid-cols-3 gap-2"><div class="bg-gray-700/80 rounded-xl flex items-center justify-center"><span class="font-bold text-lg">數量</span></div><div class="bg-gray-700/80 rounded-xl flex items-center justify-evenly p-1"><button data-action="decrease-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-${playerId}" class="text-2xl font-bold w-10 text-center">${state.quantity}</span><button data-action="increase-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div><button data-action="roll" data-player="${playerId}" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors flex items-center justify-center">骰出</button></div>`;
+            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-gray-400"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-white w-2/3 focus:outline-none focus:bg-gray-700/50 rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-action="open-modal" data-player="${playerId}" class="flex-grow bg-gray-900/50 rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center text-xs"><p class="font-bold">長按換骰</p></div></div><div class="text-center mb-2"><span class="text-gray-400 text-sm tracking-widest">骰子數字總合</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-amber-400 transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
+            return panel;
+        };
+        const createHistoryPanel = () => {
+            const panel = document.createElement('div');
+            panel.className = "bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full";
+            panel.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-bold text-gray-300">擲骰紀錄</h3>
+                    <button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">清除</button>
+                </div>
+                <div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-2 bg-gray-900/50 p-3 rounded-lg border-2 border-gray-700/50 mb-2"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button data-action="export-history" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">導出紀錄</button>
+                    <button data-action="import-history" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-500 transition-colors">導入紀錄</button>
+                </div>
+            `;
+            return panel;
+        };
+        const createSinglePlayerUI = () => {
+             return `<div class="h-full flex w-full max-w-4xl mx-auto"><div class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative"><div class="flex justify-center items-center mb-2 text-gray-400 pt-8"><span>當前類型:</span><div id="current-die-icon-display-player1" class="w-7 h-7 ml-2"></div></div><div id="dice-area-player1" data-action="open-modal" data-player="player1" class="flex-grow bg-gray-900/50 rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center leading-relaxed"><p class="font-bold">長按此處更換骰子</p><p>點擊「骰出」開始</p></div></div><div class="text-center mb-4"><span class="text-gray-400 text-lg tracking-widest">骰子數字總合</span><p id="sum-display-player1" class="text-6xl font-black tracking-tighter text-amber-400 transition-all duration-300">0</p></div><div class="grid grid-cols-5 gap-4"><div class="bg-gray-700 rounded-xl flex items-center justify-between p-2 col-span-3"><span class="font-bold ml-3 text-lg">數量</span><div class="flex items-center gap-2"><button data-action="decrease-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-player1" class="text-2xl font-bold w-10 text-center">1</span><button data-action="increase-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div></div><button data-action="roll" data-player="player1" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors col-span-2 flex items-center justify-center">骰出</button></div></div><div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-gray-900/60 p-4 border-l-2 border-gray-700/50"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-gray-300">擲骰紀錄</h3><button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">清除</button></div><div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div><input type="text" data-action="change-name" data-player="player1" class="w-full bg-gray-800/80 border-2 border-gray-700 rounded-lg py-2 px-3 mt-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="輸入使用者名稱..."><button data-action="export-history" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">導出擲骰紀錄 (.txt)</button></div></div>`;
+        };
+        const createDocsUI = () => {
+            return `
+                <div class="h-full w-full flex flex-col items-center space-y-4">
+                    <h2 class="text-2xl font-bold text-amber-300">說明文件</h2>
+                    <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
+                        <img src="assets/Singleplayermode readme.png" alt="單人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Singleplayer+Mode+Readme.png';">
                     </div>
-                `;
-                historyLogContainer.prepend(entry);
-            };
-            
-            const rollDice = () => {
-                playRandomRollSound();
-                diceArea.innerHTML = '';
-                instructionText.classList.add('hidden');
-                let totalSum = 0; let results = [];
-                for (let i = 0; i < state.quantity; i++) {
-                    const result = Math.floor(Math.random() * state.dieType) + 1;
-                    results.push(result); totalSum += result;
-                }
-                results.forEach((res, index) => { const dieElement = createDieElement(res, state.dieType); dieElement.style.animationDelay = `${index * 50}ms`; diceArea.appendChild(dieElement); });
-                sumDisplay.textContent = totalSum;
-                sumDisplay.classList.remove('scale-125'); void sumDisplay.offsetWidth;
-                sumDisplay.classList.add('scale-125', 'transition-transform', 'duration-300', 'ease-out');
-                setTimeout(() => sumDisplay.classList.remove('scale-125'), 300);
-                addHistoryEntry(totalSum, results, state.dieType, state.quantity);
-            };
-
-            const exportHistory = () => {
-                if(historyData.length === 0) { alert("目前沒有任何擲骰紀錄可供導出。"); return; }
-                const now = new Date();
-                const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-                const filename = `dice_log_${timestamp}.txt`;
-                const fileContent = historyData.slice().reverse().join('\n');
-                const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = filename;
-                document.body.appendChild(a); a.click();
-                document.body.removeChild(a); URL.revokeObjectURL(url);
-            };
-
-            const openModal = () => { playSound(buttonSound); modal.classList.remove('hidden'); modal.classList.add('flex'); };
-            const closeModal = () => { modal.classList.remove('flex'); modal.classList.add('hidden'); };
-
-            const populateDiceOptions = () => {
-                diceTypeOptionsContainer.innerHTML = '';
-                Object.keys(dieSVGs).forEach(type => {
-                    const button = document.createElement('button'); button.dataset.type = type;
-                    button.className = 'aspect-square bg-gray-600 rounded-lg flex flex-col items-center justify-center p-2 active:bg-gray-500 transition-colors';
-                    const svgContainer = document.createElement('div'); svgContainer.className = 'w-8 h-8 text-amber-400'; svgContainer.innerHTML = dieSVGs[type];
-                    const typeText = document.createElement('span'); typeText.className = 'font-bold mt-1'; typeText.textContent = `D${type}`;
-                    button.appendChild(svgContainer); button.appendChild(typeText);
-                    diceTypeOptionsContainer.appendChild(button);
-                });
-            };
-
-            // --- 事件監聽器 ---
-            increaseQtyBtn.addEventListener('click', () => { playSound(buttonSound); if (state.quantity < state.maxQty) { state.quantity++; updateUI(); } });
-            decreaseQtyBtn.addEventListener('click', () => { playSound(buttonSound); if (state.quantity > state.minQty) { state.quantity--; updateUI(); } });
-            rollButton.addEventListener('click', rollDice);
-            if (exportHistoryBtn) { exportHistoryBtn.addEventListener('click', () => { playSound(buttonSound); exportHistory(); }); }
-            if (usernameInput) { usernameInput.addEventListener('input', (e) => { state.username = e.target.value; }); }
-            
-            soundToggleBtn.addEventListener('click', () => { state.isMuted = !state.isMuted; updateSoundToggleIcon(); if (!state.isMuted) { playSound(buttonSound); } });
-            diceArea.addEventListener('pointerdown', (e) => { if(e.pointerType === 'mouse' && e.button !== 0) return; pressTimer = window.setTimeout(() => { openModal(); }, 500); });
-            const clearPressTimer = () => { clearTimeout(pressTimer); pressTimer = null; };
-            diceArea.addEventListener('pointerup', clearPressTimer);
-            diceArea.addEventListener('pointerleave', clearPressTimer);
-            diceArea.addEventListener('contextmenu', (e) => e.preventDefault());
-            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-            diceTypeOptionsContainer.addEventListener('click', (e) => {
-                const button = e.target.closest('button');
-                if (button && button.dataset.type) { playSound(buttonSound); state.dieType = parseInt(button.dataset.type, 10); updateUI(); closeModal(); }
+                     <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
+                        <img src="assets/Multiplayermode readme.png" alt="多人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Multiplayer+Mode+Readme.png';">
+                    </div>
+                </div>
+            `;
+        };
+        
+        const updateUI = (playerId) => {
+            const state = playerStates[playerId];
+            if (!state) return;
+            const qtyDisplay = document.getElementById(`quantity-display-${playerId}`);
+            const iconDisplay = document.getElementById(`current-die-icon-display-${playerId}`);
+            const sumDisplay = document.getElementById(`sum-display-${playerId}`);
+            if (qtyDisplay) qtyDisplay.textContent = state.quantity;
+            if (iconDisplay) iconDisplay.innerHTML = dieSVGs[state.dieType];
+            if (sumDisplay) sumDisplay.textContent = state.sum;
+        };
+        const createDieElement = (value, type) => {
+            const dieFace = document.createElement('div');
+            dieFace.className = 'w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center shadow-lg relative animate-roll-in';
+            const svgIcon = document.createElement('div');
+            svgIcon.className = 'absolute inset-0 text-gray-400 opacity-30 p-1';
+            svgIcon.innerHTML = dieSVGs[type];
+            const numberText = document.createElement('span');
+            numberText.className = 'text-2xl font-bold z-10';
+            numberText.textContent = value;
+            dieFace.appendChild(svgIcon);
+            dieFace.appendChild(numberText);
+            return dieFace;
+        };
+        const rollDice = (playerId) => {
+            const state = playerStates[playerId];
+            const diceArea = document.getElementById(`dice-area-${playerId}`);
+            if (!diceArea) return;
+            diceArea.innerHTML = '';
+            let totalSum = 0;
+            let results = [];
+            for (let i = 0; i < state.quantity; i++) {
+                const result = Math.floor(Math.random() * state.dieType) + 1;
+                results.push(result);
+                totalSum += result;
+            }
+            state.sum = totalSum;
+            updateUI(playerId);
+            results.forEach((res, index) => {
+                const dieElement = createDieElement(res, state.dieType);
+                dieElement.style.animationDelay = `${index * 40}ms`;
+                diceArea.appendChild(dieElement);
             });
-            if (clearHistoryBtn) { clearHistoryBtn.addEventListener('click', () => { playSound(buttonSound); historyLogContainer.innerHTML = ''; historyData = []; }); }
+            addHistoryEntry(playerId, totalSum, results, state.dieType, state.quantity);
+        };
+        const addHistoryEntry = (playerId, total, diceResults, dieType, qty) => {
+            if (!historyLogContainer) return;
+            const username = playerStates[playerId].name.trim() || '玩家';
+            const diceInfo = `${qty}d${dieType}`;
+            const resultString = `[${diceResults.join(', ')}]`;
+            const logText = `【${username}_${diceInfo}】: ${total} → ${resultString}`;
+            historyData.push(logText);
+            const entry = document.createElement('div');
+            entry.className = 'bg-gray-800/80 p-2 rounded-lg text-xs';
+            entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${username}</span><span class="text-amber-300"> 擲出 ${diceInfo}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${resultString}</p></div><span class="text-2xl font-bold">${total}</span></div>`;
+            historyLogContainer.prepend(entry);
+        };
+        const exportState = () => {
+            playSound(buttonSound);
+            let filename = `dice_log_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            let dataToExport;
+            if (currentMode === 'single') {
+                dataToExport = historyData.slice().reverse().join('\n');
+            } else {
+                const fullState = { players: playerStates, history: historyData };
+                dataToExport = JSON.stringify(fullState, null, 2);
+                filename = `dice_session_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            }
+            if (dataToExport.length === 0 && currentMode === 'single') {
+                alert("目前沒有任何擲骰紀錄可供導出。");
+                return;
+            }
+            const blob = new Blob([dataToExport], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+        };
+        const importState = (file) => {
+            playSound(buttonSound);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (importedData && importedData.players && importedData.history) {
+                        playerStates = importedData.players;
+                        historyData = importedData.history;
+                        renderUIForCurrentMode(true);
+                    } else {
+                        alert('導入失敗：檔案格式不正確。');
+                    }
+                } catch (error) {
+                    alert('導入失敗：檔案不是有效的JSON格式。');
+                    console.error("導入錯誤:", error);
+                }
+            };
+            reader.readAsText(file);
+        };
+        const setupPressAndHold = (element) => {
+            const clearPressTimer = () => {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            };
+            element.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                const panel = e.target.closest('.player-panel, div[data-player]');
+                if (!panel) return;
+                const playerId = panel.dataset.player;
+                clearPressTimer(); 
+                pressTimer = window.setTimeout(() => { openModal(playerId); }, 500);
+            });
+            
+            element.addEventListener('pointerup', clearPressTimer);
+            element.addEventListener('pointerleave', clearPressTimer);
+            element.addEventListener('contextmenu', (e) => e.preventDefault());
+        };
+        const openModal = (playerId) => {
+            globalState.activePlayerIdForModal = playerId;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+        const closeModal = () => {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        };
+        const populateDiceOptions = () => {
+            diceTypeOptionsContainer.innerHTML = '';
+            Object.keys(dieSVGs).forEach(type => {
+                const button = document.createElement('button');
+                button.dataset.type = type;
+                button.className = 'aspect-square bg-gray-600 rounded-lg flex flex-col items-center justify-center p-2 active:bg-gray-500 transition-colors';
+                button.innerHTML = `<div class="w-8 h-8 text-amber-400">${dieSVGs[type]}</div><span class="font-bold mt-1">D${type}</span>`;
+                diceTypeOptionsContainer.appendChild(button);
+            });
+        };
 
-            // --- 初始化 ---
-            populateDiceOptions();
-            updateUI();
-            updateSoundToggleIcon();
-            if (usernameInput) { usernameInput.value = state.username; } // 初始化輸入框的值
+        const renderUIForCurrentMode = (isImport = false) => {
+            mainContentContainer.innerHTML = '';
+            if (!isImport) {
+                historyData = [];
+                if (currentMode !== 'docs') {
+                    playerStates = {};
+                }
+            }
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-600', 'text-white');
+                btn.classList.add('bg-gray-700', 'text-gray-400');
+            });
+            const activeBtn = document.querySelector(`.mode-btn[data-mode="${currentMode}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-amber-600', 'text-white');
+                activeBtn.classList.remove('bg-gray-700', 'text-gray-400');
+            }
+
+            switch (currentMode) {
+                case 'single':
+                    mainContentContainer.className = 'flex-1 p-4 overflow-hidden';
+                    if (Object.keys(playerStates).length === 0) {
+                         playerStates = { 'player1': { name: '玩家', dieType: 6, quantity: 1, sum: 0 } };
+                    }
+                    mainContentContainer.innerHTML = createSinglePlayerUI();
+                    historyLogContainer = document.getElementById('history-log');
+                    const nameInput = document.querySelector('[data-action="change-name"]');
+                    nameInput.value = playerStates['player1'].name;
+                    setupPressAndHold(document.getElementById('dice-area-player1'));
+                    updateUI('player1');
+                    break;
+                case 'multi':
+                    mainContentContainer.className = 'flex-1 p-4 gap-4 grid grid-cols-3 grid-rows-2 overflow-hidden';
+                    if (Object.keys(playerStates).length === 0) {
+                        playerStates = {
+                            'gm': { name: 'GM', dieType: 6, quantity: 7, sum: 0 },
+                            'player1': { name: '玩家1', dieType: 6, quantity: 8, sum: 0 },
+                            'player2': { name: '玩家2', dieType: 6, quantity: 7, sum: 0 },
+                            'player3': { name: '玩家3', dieType: 6, quantity: 7, sum: 0 },
+                            'player4': { name: '玩家4', dieType: 6, quantity: 7, sum: 0 },
+                        };
+                    }
+                    
+                    const playerIds = Object.keys(playerStates);
+                    playerIds.forEach(pId => mainContentContainer.appendChild(createPlayerPanel(pId)));
+                    mainContentContainer.appendChild(createHistoryPanel());
+                    historyLogContainer = document.getElementById('history-log');
+                    
+                    historyData.slice().reverse().forEach(logText => {
+                        const parts = logText.match(/【(.*?)_(.*?)】: (.*?) → (\[.*\])/);
+                        if(!parts) return;
+                        const entry = document.createElement('div');
+                        entry.className = 'bg-gray-800/80 p-2 rounded-lg text-xs';
+                        entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${parts[1]}</span><span class="text-amber-300"> 擲出 ${parts[2]}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${parts[4]}</p></div><span class="text-2xl font-bold">${parts[3]}</span></div>`;
+                        historyLogContainer.append(entry);
+                    });
+
+                    playerIds.forEach(pId => {
+                        const diceArea = document.getElementById(`dice-area-${pId}`);
+                        if (diceArea) setupPressAndHold(diceArea);
+                        updateUI(pId);
+                        const nameInput = document.querySelector(`#panel-${pId} [data-action="change-name"]`);
+                        if(nameInput) nameInput.value = playerStates[pId].name;
+                    });
+                    break;
+                case 'docs':
+                    mainContentContainer.className = 'flex-1 p-4 overflow-y-auto';
+                    mainContentContainer.innerHTML = createDocsUI();
+                    break;
+            }
+        };
+
+        singleModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'single') { currentMode = 'single'; renderUIForCurrentMode(); }});
+        multiModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'multi') { currentMode = 'multi'; renderUIForCurrentMode(); }});
+        docsModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'docs') { currentMode = 'docs'; renderUIForCurrentMode(); }});
+        soundToggleBtn.addEventListener('click', () => { globalState.isMuted = !globalState.isMuted; updateSoundToggleIcon(); if (!globalState.isMuted) playSound(buttonSound); });
+        
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) { importState(file); }
+            e.target.value = '';
         });
+
+        document.body.addEventListener('click', (e) => {
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
+            
+            const action = target.dataset.action;
+            const playerId = target.dataset.player;
+
+            if(['increase-qty', 'decrease-qty', 'clear-history', 'open-modal'].includes(action)){
+                 playSound(buttonSound);
+            }
+            if(action === 'roll'){
+                playSound(buttonSound);
+                playRandomRollSound();
+            }
+
+            switch(action) {
+                case 'import-history':
+                    if (currentMode === 'multi') { importFileInput.click(); } 
+                    else { alert("導入功能僅限多人模式使用。"); }
+                    playSound(buttonSound);
+                    break;
+                case 'export-history':
+                    exportState();
+                    break;
+                case 'increase-qty': if (playerStates[playerId] && playerStates[playerId].quantity < globalState.maxQty) { playerStates[playerId].quantity++; updateUI(playerId); } break;
+                case 'decrease-qty': if (playerStates[playerId] && playerStates[playerId].quantity > globalState.minQty) { playerStates[playerId].quantity--; updateUI(playerId); } break;
+                case 'roll': if (playerStates[playerId]) rollDice(playerId); break;
+                case 'clear-history': if (historyLogContainer) historyLogContainer.innerHTML = ''; historyData = []; break;
+            }
+        });
+        
+        document.body.addEventListener('input', (e) => {
+            const target = e.target.closest('[data-action="change-name"]');
+            if(target){
+                const playerId = target.dataset.player;
+                if (playerStates[playerId]) { playerStates[playerId].name = target.value; }
+            }
+        });
+        
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        
+        diceTypeOptionsContainer.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (button && button.dataset.type) {
+                playSound(buttonSound);
+                const playerId = globalState.activePlayerIdForModal;
+                if (playerId && playerStates[playerId]) {
+                    playerStates[playerId].dieType = parseInt(button.dataset.type, 10);
+                    updateUI(playerId);
+                }
+                closeModal();
+            }
+        });
+
+        const initializeApp = () => {
+            populateDiceOptions();
+            updateSoundToggleIcon();
+            renderUIForCurrentMode();
+        };
+        
+        initializeApp();
+    });
     </script>
 </body>
 </html>
