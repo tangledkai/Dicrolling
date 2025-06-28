@@ -1,5 +1,5 @@
 
-# [TangledKai] TRPG-Diceroller-V1.1.1
+# [TangledKai] TRPG-Diceroller-V1.3.0
 * TRPG H5 Dice Tool
 * Welcome to this web-based dice tool designed for tabletop and TRPG players! With its intuitive interface, whether you're a Dungeon Master, Game Master (GM), or player, you can enjoy a seamless dice-rolling experience using this tool.
 
@@ -25,7 +25,7 @@
 * Font Modes
   *  Available Fonts: Includes Source Han Sans and pixel-style font Cubic 11
 _____
-# [TangledKai]_TRPG-Diceroller-V1.1.1
+# [TangledKai]_TRPG-Diceroller-V1.3.0
 * TRPG H5 骰子工具
 * 歡迎使用這款為桌遊與 TRPG 玩家打造的網頁骰子工具！操作直觀，無論您是城主、遊戲主持人 (GM) 還是玩家，都能透過骰子工具獲得擲骰體驗。
 
