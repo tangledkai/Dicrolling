@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRPG-Diceroller-V1.1.1</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <title id="page-title">TRPG-Diceroller-V1.3.0</title>
+    <!-- 假設 tailwind.js 存在於 js/ 資料夾中，用於離線 Tailwind CSS -->
+    <script src="js/tailwind.js"></script> 
+    <!-- 動態載入字體規則的 style 標籤 -->
+    <style id="dynamic-font-rules"></style> 
     <style>
-        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* 基礎樣式 */
+        body { -webkit-tap-highlight-color: transparent; }
         @keyframes roll-in {
             0% { transform: scale(0.5) rotate(-180deg) translateY(-50px); opacity: 0; }
             80% { transform: scale(1.1) rotate(10deg); opacity: 1; }
@@ -21,42 +22,59 @@
         .history-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
         .history-log::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 10px; }
         .history-log::-webkit-scrollbar-thumb:hover { background: #718096; }
+        /* 下拉選單的過渡效果 */
+        .dropdown-menu { transition: opacity 0.2s ease, transform 0.2s ease; }
     </style>
 </head>
 <body class="bg-gray-800 text-white select-none overflow-hidden h-screen flex">
 
+    <!-- 骰子類型選擇模態框 -->
     <div id="dice-type-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4 transition-opacity duration-300">
         <div class="bg-gray-700 rounded-2xl p-6 shadow-2xl w-full max-w-xs">
-            <h3 class="text-xl mb-6 text-center font-bold text-gray-200">選擇骰子類型</h3>
+            <h3 id="modal-title" class="text-xl mb-6 text-center font-bold text-gray-200"></h3>
             <div id="dice-type-options" class="grid grid-cols-3 gap-4"></div>
         </div>
     </div>
 
+    <!-- 控制側邊欄 -->
     <div id="control-sidebar" class="w-48 bg-gray-900/60 p-4 flex flex-col">
-        <h1 class="text-xl font-black text-center text-amber-300">骨灰級骰子工具</h1>
+        <h1 id="tool-title" class="text-xl font-black text-center text-amber-300"></h1>
         <div class="flex-grow flex flex-col space-y-2 mt-4">
-            <button id="single-mode-btn" data-mode="single" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">單人模式</button>
-            <button id="multi-mode-btn" data-mode="multi" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">多人模式</button>
-            <button id="docs-mode-btn" data-mode="docs" class="mode-btn w-full py-3 rounded-lg font-bold transition-colors">說明文件</button>
+            <!-- 模式按鈕 -->
+            <button id="single-mode-btn" data-mode="single" class="mode-btn w-full py-3 rounded-lg font-bold text-xl transition-colors"></button>
+            <button id="multi-mode-btn" data-mode="multi" class="mode-btn w-full py-3 rounded-lg font-bold text-xl transition-colors"></button>
+            <button id="docs-mode-btn" data-mode="docs" class="mode-btn w-full py-3 rounded-lg font-bold text-xl transition-colors"></button>
         </div>
-        <a href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mb-2 text-center text-base text-gray-500 hover:text-amber-300 transition-colors no-underline">
-            tangledkai_2.0 製作
+        
+        <!-- 字體切換器 -->
+        <div id="font-switcher" class="relative mb-2">
+            <button id="font-dropdown-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-lg font-bold"></button>
+            <div id="font-dropdown-menu" class="hidden dropdown-menu absolute bottom-full left-0 w-full mb-1 bg-gray-600 rounded-lg shadow-lg">
+            </div>
+        </div>
+
+        <!-- 語系切換器 -->
+        <div id="lang-switcher" class="relative mb-2">
+            <button id="lang-dropdown-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-lg font-bold"></button>
+            <div id="lang-dropdown-menu" class="hidden dropdown-menu absolute bottom-full left-0 w-full mb-1 bg-gray-600 rounded-lg shadow-lg">
+            </div>
+        </div>
+
+        <!-- 音效開關按鈕 -->
+        <button id="sound-toggle-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors"></button>
+        <!-- 製作者連結 -->
+        <a id="made-by-link" href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mt-2 text-center text-base text-gray-500 hover:text-amber-300 transition-colors no-underline">
         </a>
-        <button id="sound-toggle-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors">
-
-        </button>
     </div>
 
-
-    <div id="main-content" class="flex-1 p-4">
-
-    </div>
-    
+    <!-- 主要內容區域 -->
+    <div id="main-content" class="flex-1 p-4"></div>
+    <!-- 隱藏的檔案輸入框，用於導入功能 -->
     <input type="file" id="import-file-input" class="hidden" accept=".txt,.json">
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-
+        // DOM 元素引用
         const mainContentContainer = document.getElementById('main-content');
         const modal = document.getElementById('dice-type-modal');
         const diceTypeOptionsContainer = document.getElementById('dice-type-options');
@@ -65,26 +83,30 @@
         const docsModeBtn = document.getElementById('docs-mode-btn');
         const soundToggleBtn = document.getElementById('sound-toggle-btn');
         const importFileInput = document.getElementById('import-file-input');
-        let historyLogContainer; 
+        const fontRulesStyleTag = document.getElementById('dynamic-font-rules'); // 用於動態載入字體規則
+        
+        const langDropdownBtn = document.getElementById('lang-dropdown-btn'); // 語系切換按鈕
+        const langDropdownMenu = document.getElementById('lang-dropdown-menu'); // 語系切換選單
+        const fontDropdownBtn = document.getElementById('font-dropdown-btn'); // 字體切換按鈕
+        const fontDropdownMenu = document.getElementById('font-dropdown-menu'); // 字體切換選單
 
+        let historyLogContainer; // 擲骰紀錄容器，動態設定
 
-        let currentMode = 'multi';
+        // 全域狀態變數
+        let currentMode = localStorage.getItem('currentMode') || 'multi'; // 從 localStorage 載入模式
         let playerStates = {};
         let globalState = { minQty: 1, maxQty: 32, isMuted: false, activePlayerIdForModal: null };
         let historyData = [];
-        let pressTimer = null;
+        let pressTimer = null; // 長按計時器
 
-
+        // 聲音檔案
         const buttonSound = new Audio('assets/button001.mp3');
         const rollSoundFiles = ['assets/dice001.wav', 'assets/dice002.wav', 'assets/dice003.wav', 'assets/dice004.wav', 'assets/dice005.wav'];
         const rollSounds = rollSoundFiles.map(file => new Audio(file));
+        // SVG 圖示
         const soundOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
         const soundOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
-        const playSound = (audio) => { if (!globalState.isMuted) { audio.currentTime = 0; audio.play().catch(e=>console.warn("音效播放失敗", e)); } };
-        const playRandomRollSound = () => playSound(rollSounds[Math.floor(Math.random() * rollSounds.length)]);
-        const updateSoundToggleIcon = () => { soundToggleBtn.innerHTML = globalState.isMuted ? soundOffIcon : soundOnIcon; };
-
-
+        
         const dieSVGs = {
             4: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 85H5L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
             6: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="90" rx="10" stroke="currentColor" stroke-width="5"/></svg>`,
@@ -94,82 +116,183 @@
             20: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L90 35V65L50 95L10 65V35L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
         };
 
-        const createPlayerPanel = (playerId) => {
+        // 語言資料
+        const languages = {
+            'zh-TW': { name: '繁體中文', data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"骨灰級骰子工具","singleMode":"單人模式","multiMode":"多人模式","docs":"說明文件","madeBy":"tangledkai_2.0 製作","selectDieType":"選擇骰子類型","currentDieType":"當前類型:","quantity":"數量","roll":"骰出","totalSum":"骰子數字總合"},"singlePlayer":{"longPressHint":"長按此處更換骰子","clickToStartHint":"點擊「骰出」開始","historyTitle":"擲骰紀錄","clear":"清除","usernamePlaceholder":"輸入使用者名稱...","exportLog":"導出擲骰紀錄 (.txt)"},"multiPlayer":{"longPressHint":"長按換骰","defaultGMName":"GM","defaultPlayerName":"玩家","historyTitle":"擲骰紀錄","clear":"清除","exportLog":"導出紀錄","importLog":"導入紀錄"},"docs":{"title":"TRPG-骨灰級骰子工具","welcome":"歡迎使用這款為桌遊與 TRPG 玩家打造的網頁骰子工具！操作直觀，無論您是城主、遊戲主持人 (GM) 還是玩家，都能透過骰子工具獲得擲骰體驗。","featuresTitle":"完整功能說明","menuTitle":"選單介面（左側控制欄）","menuSwitch":"模式切換：","menuSwitchDesc":"在「單人模式」、「多人模式」與「說明文件」之間切換應用程式的主要功能。","menuAudio":"音效開關：","menuAudioDesc":"點擊喇叭圖示，可以在「開啟音效」與「靜音」之間切換音效。","singlePlayerTitle":"單人模式","singlePlayerCore":"核心功能：","singlePlayerCoreDesc":"提供一個大型的個人擲骰面板，包含骰子表演區、總和顯示與數量控制。","singlePlayerChangeDie":"更換骰子類型：","singlePlayerChangeDieDesc":"在「骰子表演區」長按（按住約半秒），即可彈出選單來更換骰子類型（D4, D6, D8, D10, D12, D20）。","singlePlayerHistory":"歷史紀錄：","singlePlayerHistoryDesc":"畫面右側會顯示詳細的擲骰歷史，並可輸入玩家名稱。","singlePlayerExport":"導出紀錄：","singlePlayerExportDesc":"可將右側的擲骰歷史紀錄打包成一個 .txt 文字檔下載。","multiPlayerTitle":"多人模式","multiPlayerLayout":"5+1 面板佈局：","multiPlayerLayoutDesc":"包含 5 個玩家面板（含 1 個 GM）和 1 個共用的歷史紀錄面板。","multiPlayerControls":"獨立控制：","multiPlayerControlsDesc":"每個玩家面板都有獨立的名稱、骰子類型、數量控制與擲骰按鈕。","multiPlayerSaveLoad":"存檔與讀檔：","multiPlayerExport":"導出紀錄：","multiPlayerExportDesc":"點擊此按鈕，會將當前所有玩家的面板設定（名稱、骰子類型、數量等）與完整的歷史紀錄，打包成一個 .txt 存檔。","multiPlayerImport":"導入紀錄：","multiPlayerImportDesc":"點擊此按鈕並選擇之前導出的存檔，即可完整還原整個遊戲場面，包含所有玩家設定與歷史紀錄。","imagesTitle":"說明圖片"},"system":{"audioFail":"音效播放失敗","rolled":"擲出","exportEmpty":"目前沒有任何擲骰紀錄可供導出。","importForMultiOnly":"導入功能僅限多人模式使用。","importInvalidFormat":"導入失敗：檔案格式不正確。","importInvalidJSON":"導入失敗：檔案不是有效的JSON格式。","importErrorConsole":"導入錯誤:"}} },
+            'zh-CN': { name: '简体中文', data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"骨灰级骰子工具","singleMode":"单人模式","multiMode":"多人模式","docs":"说明文件","madeBy":"tangledkai_2.0 制作","selectDieType":"选择骰子类型","currentDieType":"当前类型:","quantity":"数量","roll":"掷骰","totalSum":"骰子数字总和"},"singlePlayer":{"longPressHint":"长按此处更换骰子","clickToStartHint":"点击“掷骰”开始","historyTitle":"掷骰记录","clear":"清除","usernamePlaceholder":"输入使用者名称...","exportLog":"导出掷骰记录 (.txt)"},"multiPlayer":{"longPressHint":"长按换骰","defaultGMName":"GM","defaultPlayerName":"玩家","historyTitle":"掷骰记录","clear":"清除","exportLog":"导出记录","importLog":"导入记录"},"docs":{"title":"TRPG-骨灰级骰子工具","welcome":"欢迎使用这款为桌游与 TRPG 玩家打造的网页骰子工具！操作直观，无论您是城主、游戏主持人 (GM) 还是玩家，都能透过骰子工具获得掷骰体验。","featuresTitle":"完整功能说明","menuTitle":"菜单接口（左侧控制栏）","menuSwitch":"模式切换：","menuSwitchDesc":"在“单人模式”、“多人模式”与“说明文件”之间切换应用程序的主要功能。","menuAudio":"音效开关：","menuAudioDesc":"点击喇叭图标，可以在“开启音效”与“静音”之间切换音效。","singlePlayerTitle":"单人模式","singlePlayerCore":"核心功能：","singlePlayerCoreDesc":"提供一个大型的个人掷骰面板，包含骰子表演区、总和显示与数量控制。","singlePlayerChangeDie":"更换骰子类型：","singlePlayerChangeDieDesc":"在“骰子表演区”长按（按住約半秒），即可弹出菜单来更换骰子类型（D4, D6, D8, D10, D12, D20）。","singlePlayerHistory":"历史记录：","singlePlayerHistoryDesc":"画面右侧会显示详细的掷骰历史，并可输入玩家名称。","singlePlayerExport":"导出记录：","singlePlayerExportDesc":"可将右側的掷骰历史记录打包成一个 .txt 文字文件下载。","multiPlayerTitle":"多人模式","multiPlayerLayout":"5+1 面板布局：","multiPlayerLayoutDesc":"包含 5 个玩家面板（含 1 个 GM）和 1 个共享的历史记录面板。","multiPlayerControls":"独立控制：","multiPlayerControlsDesc":"每个玩家面板都有独立的名称、骰子类型、数量控制与掷骰按钮。","multiPlayerSaveLoad":"存档与读档：","multiPlayerExport":"导出记录：","multiPlayerExportDesc":"点击此按钮，会将当前所有玩家的面板设定（名称、骰子类型、数量等）与完整的历史记录，打包成一个 .txt 存档。","multiPlayerImport":"导入记录：","multiPlayerImportDesc":"点击此按钮并选择之前导出的存档，即可完整还原整个游戏场面，包含所有玩家设定与历史记录。","imagesTitle":"说明图片"},"system":{"audioFail":"音效播放失败","rolled":"掷出","exportEmpty":"目前没有任何掷骰记录可供导出。","importForMultiOnly":"导入功能仅限多人模式使用。","importInvalidFormat":"导入失败：文件格式不正确。","importInvalidJSON":"导入失败：文件不是有效的JSON格式。","importErrorConsole":"导入错误:"}} },
+            'en':    { name: 'English',  data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"Hardcore Dice Roller","singleMode":"Single Player","multiMode":"Multiplayer","docs":"Documentation","madeBy":"tangledkai_2.0 製作","selectDieType":"Select Die Type","currentDieType":"Current Type:","quantity":"Quantity","roll":"Roll","totalSum":"Total Sum of Dice"},"singlePlayer":{"longPressHint":"Long press here to change die","clickToStartHint":"Click 'Roll' to start","historyTitle":"Roll History","clear":"Clear","usernamePlaceholder":"Enter username...","exportLog":"Export Roll History (.txt)"},"multiPlayer":{"longPressHint":"Long press to change","defaultGMName":"GM","defaultPlayerName":"Player","historyTitle":"Roll History","clear":"Clear","exportLog":"Export Log","importLog":"Import Log"},"docs":{"title":"TRPG - Hardcore Dice Roller","welcome":"Welcome to this web-based dice tool designed for tabletop and TRPG players! With intuitive controls, whether you are a Game Master (GM) or a player, you can get a great dice rolling experience.","featuresTitle":"Full Feature Guide","menuTitle":"Menu Interface (Left Sidebar)","menuSwitch":"Mode Switch:","menuSwitchDesc":"Switch the main function of the application between 'Single Player', 'Multiplayer', and 'Documentation'.","menuAudio":"Audio Toggle:","menuAudioDesc":"Click the speaker icon to toggle between 'Sound On' and 'Mute'.","singlePlayerTitle":"Single Player Mode","singlePlayerCore":"Core Function:","singlePlayerCoreDesc":"Provides a large, personal dice rolling panel, including a dice display area, sum total, and quantity controls.","singlePlayerChangeDie":"Change Die Type:","singlePlayerChangeDieDesc":"Long press (hold for about half a second) in the 'dice display area' to bring up a menu to change the die type (D4, D6, D8, D10, D12, D20).","singlePlayerHistory":"History Log:","singlePlayerHistoryDesc":"The right side of the screen displays a detailed roll history, where you can also enter a player name.","singlePlayerExport":"Export Log:","singlePlayerExportDesc":"Allows you to download the roll history on the right as a .txt text file.","multiPlayerTitle":"Multiplayer Mode","multiPlayerLayout":"5+1 Panel Layout:","multiPlayerLayoutDesc":"Includes 5 player panels (including 1 GM) and 1 shared history log panel.","multiPlayerControls":"Independent Controls:","multiPlayerControlsDesc":"Each player panel has its own name, die type, quantity control, and roll button.","multiPlayerSaveLoad":"Save & Load:","multiPlayerExport":"Export Log:","multiPlayerExportDesc":"Click this button to package the current settings of all player panels (name, die type, quantity, etc.) and the complete history log into a .txt save file.","multiPlayerImport":"Import Log:","multiPlayerImportDesc":"Click this button and select a previously exported save file to completely restore the entire game session, including all player settings and history.","imagesTitle":"Instructional Images"},"system":{"audioFail":"Audio playback failed","rolled":"rolled","exportEmpty":"There is currently no roll history to export.","importForMultiOnly":"Import function is only available in multiplayer mode.","importInvalidFormat":"Import failed: Invalid file format.","importInvalidJSON":"The file is not a valid JSON format.","importErrorConsole":"Import Error:"}} },
+            'ja':    { name: '日本語',   data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"ハードコア・ダイスローラー","singleMode":"シングルプレイヤー","multiMode":"マルチプレイヤー","docs":"説明書","madeBy":"作成者 tangledkai_2.0","selectDieType":"ダイスの種類を選択","currentDieType":"現在の種類:","quantity":"数量","roll":"振る","totalSum":"ダイスの合計値"},"singlePlayer":{"longPressHint":"長押しでダイスを変更","clickToStartHint":"「振る」をクリックして開始","historyTitle":"履歴","clear":"クリア","usernamePlaceholder":"ユーザー名を入力...","exportLog":"履歴をエクスポート (.txt)"},"multiPlayer":{"longPressHint":"長押しで変更","defaultGMName":"GM","defaultPlayerName":"プレイヤー","historyTitle":"履歴","clear":"クリア","exportLog":"ログをエクスポート","importLog":"ログをインポート"},"docs":{"title":"TRPG-ハードコア・ダイスローラー","welcome":"テーブルトップゲームとTRPGプレイヤーのために作られたこのウェブダイスツールへようこそ！直感的な操作で、ゲームマスター（GM）でもプレイヤーでも、素晴らしいダイス体験ができます。","featuresTitle":"全機能説明","menuTitle":"メニューインターフェース（左側サイドバー）","menuSwitch":"モード切替：","menuSwitchDesc":"「シングルプレイヤー」、「マルチプレイヤー」、「説明書」の間でアプリケーションの主要機能を切り替えます。","menuAudio":"音声スイッチ：","menuAudioDesc":"スピーカーアイコンをクリックして、音声のオン・オフを切り替えます。","singlePlayerTitle":"シングルプレイヤーモード","singlePlayerCore":"主要機能：","singlePlayerCoreDesc":"ダイス表示エリア、合計値表示、数量コントロールを含む大型の個人用ダイスパネルを提供します。","singlePlayerChangeDie":"ダイスの種類変更：","singlePlayerChangeDieDesc":"「ダイス表示エリア」を長押し（約0.5秒）すると、ダイスの種類（D4, D6, D8, D10, D12, D20）を変更するメニューが表示されます。","singlePlayerHistory":"履歴ログ：","singlePlayerHistoryDesc":"画面右側に詳細なダイスロール履歴が表示され、プレイヤー名も入力できます。","singlePlayerExport":"ログのエクスポート：","singlePlayerExportDesc":"右側のダイスロール履歴を.txtテキストファイルとしてダウンロードできます。","multiPlayerTitle":"マルチプレイヤーモード","multiPlayerLayout":"5+1 パネルレイアウト：","multiPlayerLayoutDesc":"5つのプレイヤーパネル（GM1人を含む）と1つの共有履歴パネルが含まれます。","multiPlayerControls":"独立したコントロール：","multiPlayerControlsDesc":"各プレイヤーパネルには、独立した名前、ダイスの種類、数量コントロール、ロールボタンがあります。","multiPlayerSaveLoad":"セーブ＆ロード：","multiPlayerExport":"ログのエクスポート：","multiPlayerExportDesc":"このボタンをクリックすると、現在の全プレイヤーのパネル設定（名前、ダイスの種類、数量など）と完全な履歴が.txtセーブファイルとしてパッケージ化されます。","multiPlayerImport":"ログのインポート：","multiPlayerImportDesc":"このボタンをクリックして以前にエクスポートしたセーブファイルを選択すると、全プレイヤー設定と履歴を含むゲームセッション全体が完全に復元されます。","imagesTitle":"説明画像"},"system":{"audioFail":"音声再生に失敗しました","rolled":"が振った","exportEmpty":"現在エクスポートできる履歴がありません。","importForMultiOnly":"インポート機能はマルチプレイヤーモードでのみ利用可能です。","importInvalidFormat":"インポート失敗：ファイル形式が正しくありません。","importInvalidJSON":"インポート失敗：ファイルが有効なJSON形式ではありません。","importErrorConsole":"インポートエラー:"}} },
+            'ko':    { name: '한국어',    data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"하드코어 주사위 툴","singleMode":"싱글 플레이어","multiMode":"멀티플레이어","docs":"설명서","madeBy":"제작: tangledkai_2.0","selectDieType":"주사위 종류 선택","currentDieType":"현재 종류:","quantity":"수량","roll":"굴리기","totalSum":"주사위 총합"},"singlePlayer":{"longPressHint":"주사위를 변경하려면 길게 누르세요","clickToStartHint":"'굴리기'를 클릭하여 시작","historyTitle":"기록","clear":"지우기","usernamePlaceholder":"사용자 이름 입력...","exportLog":"기록 내보내기 (.txt)"},"multiPlayer":{"longPressHint":"변경하려면 길게 누르세요","defaultGMName":"GM","defaultPlayerName":"플레이어","historyTitle":"기록","clear":"지우기","exportLog":"로그 내보내기","importLog":"로그 가져오기"},"docs":{"title":"TRPG-하드코어 주사위 툴","welcome":"테이블탑 및 TRPG 플레이어를 위해 제작된 이 웹 주사위 툴에 오신 것을 환영합니다! 직관적인 조작으로 게임 마스터(GM)든 플레이어든 훌륭한 주사위 굴리기 경험을 할 수 있습니다.","featuresTitle":"전체 기능 설명","menuTitle":"메뉴 인터페이스 (왼쪽 사이드바)","menuSwitch":"모드 전환:","menuSwitchDesc":"애플리케이션의 주요 기능을 '싱글 플레이어', '멀티플레이어', '설명서' 모드로 전환합니다。","menuAudio":"오디오 토글:","menuAudioDesc":"스피커 아이콘을 클릭하여 오디오를 켜거나 끌 수 있습니다。","singlePlayerTitle":"싱글 플레이어 모드","singlePlayerCore":"핵심 기능:","singlePlayerCoreDesc":"주사위 표시 영역, 합계 표시, 수량 조절 기능을 포함한 대형 개인 주사위 패널을 제공합니다。","singlePlayerChangeDie":"주사위 종류 변경:","singlePlayerChangeDieDesc":"'주사위 표시 영역'을 길게 누르면(약 0.5초) 주사위 종류(D4, D6, D8, D10, D12, D20)를 변경할 수 있는 메뉴가 나타납니다。","singlePlayerHistory":"기록 로그:","singlePlayerHistoryDesc":"화면 오른쪽에 상세한 주사위 굴리기 기록이 표시되며, 플레이어 이름을 입력할 수도 있습니다。","singlePlayerExport":"로그 내보내기:","singlePlayerExportDesc":"오른쪽의 주사위 굴리기 기록을 .txt 텍스트 파일로 다운로드할 수 있습니다。","multiPlayerTitle":"멀티플레이어 모드","multiPlayerLayout":"5+1 패널 레이아웃:","multiPlayerLayoutDesc":"5개의 플레이어 패널(GM 1명 포함)과 1개의 공유 기록 패널이 포함됩니다。","multiPlayerControls":"독립적인 제어:","multiPlayerControlsDesc":"각 플레이어 패널에는 독립적인 이름, 주사위 종류, 수량 조절 및 굴리기 버튼이 있습니다。","multiPlayerSaveLoad":"저장 및 불러오기:","multiPlayerExport":"로그 내보내기:","multiPlayerExportDesc":"이 버튼을 클릭하면 현재 모든 플레이어의 패널 설정(이름, 주사위 종류, 수량 등)과 전체 기록이 .txt 저장 파일로 패키징됩니다。","multiPlayerImport":"로그 가져오기:","multiPlayerImportDesc":"이 버튼을 클릭하고 이전에 내보낸 저장 파일을 선택하면 모든 플레이어 설정과 기록을 포함한 전체 게임 세션을 완전히 복원할 수 있습니다。","imagesTitle":"説明圖片"},"system":{"audioFail":"오디오 재생 실패","rolled":"굴림","exportEmpty":"現在내보낼 기록이 없습니다。","importForMultiOnly":"가져오기 기능은 멀티플레이어 모드에서만 사용할 수 있습니다。","importInvalidFormat":"가져오기 실패: 파일 형식이 잘못되었습니다。","importInvalidJSON":"가져오기 실패: 유효한 JSON 형식이 아닙니다。","importErrorConsole":"가져오기 오류:"}} }
+        };
+
+        // 從 localStorage 載入目前的語言，如果沒有則預設為繁體中文
+        let currentLang = localStorage.getItem('language') || 'zh-TW';
+        let languageData = languages[currentLang].data; // 初始化 languageData
+        
+        // v9: 字體設定
+        let currentFont = localStorage.getItem('font') || 'NotoSansTC'; // 從 localStorage 載入字體
+        const fonts = {
+            'NotoSansTC': { name: 'NotoSansTC', family: "'Noto Sans TC', 'Inter', sans-serif" },
+            'Cubic': { name: 'Cubic-11', family: "'Cubic 11', sans-serif" }
+        };
+
+        // 函式：設定字體
+        function setFont(fontKey) {
+            currentFont = fontKey;
+            localStorage.setItem('font', currentFont); // 儲存字體設定
+            const font = fonts[fontKey];
+            let fontFaceRule = "";
+            if (fontKey === 'Cubic') {
+                fontFaceRule = `@font-face { font-family: 'Cubic 11'; src: url('fonts/Cubic_11_1.013_R.ttf') format('truetype'); }`;
+            } else {
+                // 為 Noto Sans TC 和 Inter 添加本地 font-face 規則
+                fontFaceRule = `@font-face { font-family: 'Noto Sans TC'; src: url('fonts/NotoSansTC-Regular.otf') format('opentype'); } @font-face { font-family: 'Inter'; src: url('assets/fonts/Inter-Regular.ttf') format('truetype'); }`;
+            }            
+            fontRulesStyleTag.innerHTML = fontFaceRule;
+            document.body.style.fontFamily = font.family;
+            updateFontSwitcher();
+        }
+
+        // 函式：更新字體切換器顯示
+        function updateFontSwitcher() {
+            const btn = document.getElementById('font-dropdown-btn');
+            const menu = document.getElementById('font-dropdown-menu');
+            if (btn) btn.textContent = fonts[currentFont].name;
+            
+            if (menu) {
+                menu.innerHTML = '';
+                Object.keys(fonts).forEach(fontCode => {
+                    // 避免在選單中顯示當前已選的字體
+                    if (fontCode !== currentFont) {
+                        const item = document.createElement('button');
+                        item.textContent = fonts[fontCode].name;
+                        item.dataset.font = fontCode;
+                        item.className = 'block w-full text-left px-4 py-2 text-lg hover:bg-gray-700 rounded-lg'; // 新增 rounded-lg 讓邊角更圓滑
+                        menu.appendChild(item);
+                    }
+                });
+            }
+        }
+        
+        // 播放音效函式
+        function playSound(audio) { 
+            if (!globalState.isMuted) { 
+                audio.currentTime = 0; 
+                audio.play().catch(e=>console.warn(languageData.system.audioFail, e)); 
+            } 
+        };
+        // 播放隨機擲骰音效函式
+        function playRandomRollSound() { playSound(rollSounds[Math.floor(Math.random() * rollSounds.length)]); };
+        // 更新音效開關圖示
+        function updateSoundToggleIcon(){ 
+            soundToggleBtn.innerHTML = globalState.isMuted ? soundOffIcon : soundOnIcon; 
+        };
+
+        // 設定語言函式
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', currentLang); // 儲存語言設定
+            languageData = languages[lang].data;
+            renderUIForCurrentMode(); // 重新渲染 UI 以更新所有文字
+            updateLanguageSwitcher(); // 更新語言切換器顯示
+        };
+
+        // 更新語言切換器顯示
+        function updateLanguageSwitcher() {
+            const btn = document.getElementById('lang-dropdown-btn');
+            const menu = document.getElementById('lang-dropdown-menu');
+            if (btn) btn.textContent = languages[currentLang].name;
+            
+            if (menu) {
+                menu.innerHTML = '';
+                Object.keys(languages).forEach(langCode => {
+                    if (langCode !== currentLang) {
+                        const item = document.createElement('button');
+                        item.textContent = languages[langCode].name;
+                        item.dataset.lang = langCode;
+                        item.className = 'block w-full text-left px-4 py-2 text-lg hover:bg-gray-700 rounded-lg'; // 新增 rounded-lg
+                        menu.appendChild(item);
+                    }
+                });
+            }
+        };
+
+        // 創建玩家面板 HTML
+        function createPlayerPanel(playerId) {
             const state = playerStates[playerId];
+            if(!state) return null; // 如果狀態不存在，返回 null
             const panel = document.createElement('div');
             panel.id = `panel-${playerId}`;
             panel.className = `player-panel bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full`;
-            const controlsHTML = `<div class="grid grid-cols-3 gap-2"><div class="bg-gray-700/80 rounded-xl flex items-center justify-center"><span class="font-bold text-lg">數量</span></div><div class="bg-gray-700/80 rounded-xl flex items-center justify-evenly p-1"><button data-action="decrease-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-${playerId}" class="text-2xl font-bold w-10 text-center">${state.quantity}</span><button data-action="increase-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div><button data-action="roll" data-player="${playerId}" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors flex items-center justify-center">骰出</button></div>`;
-            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-gray-400"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-white w-2/3 focus:outline-none focus:bg-gray-700/50 rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-action="open-modal" data-player="${playerId}" class="flex-grow bg-gray-900/50 rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center text-2xl"><p class="font-bold">長按換骰</p></div></div><div class="text-center mb-2"><span class="text-gray-400 text-sm tracking-widest">骰子數字總合</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-amber-400 transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
+            const controlsHTML = `<div class="grid grid-cols-3 gap-2"><div class="bg-gray-700/80 rounded-xl flex items-center justify-center"><span class="font-bold text-xl">${languageData.common.quantity}</span></div><div class="bg-gray-700/80 rounded-xl flex items-center justify-evenly p-1"><button data-action="decrease-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-${playerId}" class="text-2xl font-bold w-10 text-center">${state.quantity}</span><button data-action="increase-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div><button data-action="roll" data-player="${playerId}" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors flex items-center justify-center">${languageData.common.roll}</button></div>`;
+            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-gray-400"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-white w-2/3 focus:outline-none focus:bg-gray-700/50 rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-player="${playerId}" class="flex-grow bg-gray-900/50 rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center text-2xl"><p class="font-bold">${languageData.multiPlayer.longPressHint}</p></div></div><div class="text-center mb-2"><span class="text-gray-400 text-sm tracking-widest">${languageData.common.totalSum}</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-amber-400 transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
             return panel;
         };
-        const createHistoryPanel = () => {
+        
+        // 創建歷史紀錄面板 HTML
+        function createHistoryPanel() {
             const panel = document.createElement('div');
             panel.className = "bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full";
             panel.innerHTML = `
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-lg font-bold text-gray-300">擲骰紀錄</h3>
-                    <button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">清除</button>
+                    <h3 class="text-lg font-bold text-gray-300">${languageData.multiPlayer.historyTitle}</h3>
+                    <button data-action="clear-history" class="text-lg text-red-400 hover:text-red-300 active:text-red-500 transition-colors">${languageData.multiPlayer.clear}</button>
                 </div>
                 <div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-2 bg-gray-900/50 p-3 rounded-lg border-2 border-gray-700/50 mb-2"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button data-action="export-history" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">導出紀錄</button>
-                    <button data-action="import-history" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-500 transition-colors">導入紀錄</button>
+                    <button data-action="export-history" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 text-xl transition-colors">${languageData.multiPlayer.exportLog}</button>
+                    <button data-action="import-history" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-500 text-xl transition-colors">${languageData.multiPlayer.importLog}</button>
                 </div>
             `;
             return panel;
         };
-        const createSinglePlayerUI = () => {
-             return `<div class="h-full flex w-full max-w-4xl mx-auto"><div class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative"><div class="flex justify-center items-center mb-2 text-gray-400 pt-8"><span>當前類型:</span><div id="current-die-icon-display-player1" class="w-7 h-7 ml-2"></div></div><div id="dice-area-player1" data-action="open-modal" data-player="player1" class="flex-grow bg-gray-900/50 rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center leading-relaxed"><p class="font-bold">長按此處更換骰子</p><p>點擊「骰出」開始</p></div></div><div class="text-center mb-4"><span class="text-gray-400 text-lg tracking-widest">骰子數字總合</span><p id="sum-display-player1" class="text-6xl font-black tracking-tighter text-amber-400 transition-all duration-300">0</p></div><div class="grid grid-cols-5 gap-4"><div class="bg-gray-700 rounded-xl flex items-center justify-between p-2 col-span-3"><span class="font-bold ml-3 text-lg">數量</span><div class="flex items-center gap-2"><button data-action="decrease-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-player1" class="text-2xl font-bold w-10 text-center">1</span><button data-action="increase-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div></div><button data-action="roll" data-player="player1" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors col-span-2 flex items-center justify-center">骰出</button></div></div><div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-gray-900/60 p-4 border-l-2 border-gray-700/50"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-gray-300">擲骰紀錄</h3><button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">清除</button></div><div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div><input type="text" data-action="change-name" data-player="player1" class="w-full bg-gray-800/80 border-2 border-gray-700 rounded-lg py-2 px-3 mt-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="輸入使用者名稱..."><button data-action="export-history" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">導出擲骰紀錄 (.txt)</button></div></div>`;
-           
         
+        // 創建單人模式 UI HTML
+        function createSinglePlayerUI() {
+            return `<div class="h-full flex w-full max-w-4xl mx-auto"><div class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative"><div class="flex justify-center items-center mb-2 text-gray-400 pt-8"><span>${languageData.common.currentDieType}</span><div id="current-die-icon-display-player1" class="w-7 h-7 ml-2"></div></div><div id="dice-area-player1" data-player="player1" class="flex-grow bg-gray-900/50 rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center leading-relaxed text-base "><p class="font-bold">${languageData.singlePlayer.longPressHint}</p><p>${languageData.singlePlayer.clickToStartHint}</p></div></div><div class="text-center mb-4"><span class="text-gray-400 text-lg tracking-widest">${languageData.common.totalSum}</span><p id="sum-display-player1" class="text-6xl font-black tracking-tighter text-amber-400 transition-all duration-300">0</p></div><div class="grid grid-cols-5 gap-4"><div class="bg-gray-700 rounded-xl flex items-center justify-between p-2 col-span-3"><span class="font-bold ml-3 text-lg">${languageData.common.quantity}</span><div class="flex items-center gap-2"><button data-action="decrease-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-player1" class="text-2xl font-bold w-10 text-center">1</span><button data-action="increase-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div></div><button data-action="roll" data-player="player1" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors col-span-2 flex items-center justify-center">${languageData.common.roll}</button></div></div><div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-gray-900/60 p-4 border-l-2 border-gray-700/50"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-gray-300">${languageData.singlePlayer.historyTitle}</h3><button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">${languageData.singlePlayer.clear}</button></div><div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div><input type="text" data-action="change-name" data-player="player1" class="w-full bg-gray-800/80 border-2 border-gray-700 rounded-lg py-2 px-3 mt-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="${languageData.singlePlayer.usernamePlaceholder}"><button data-action="export-history" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">${languageData.singlePlayer.exportLog}</button></div></div>`;
         };
-        const createDocsUI = () => {
+        
+        // 創建說明文件 UI HTML
+        function createDocsUI() {
+            const doc = languageData.docs;
             return `
             <div class="h-full w-full flex flex-col text-gray-300 p-4 space-y-6 text-base">
-                <h2 class="text-3xl font-black text-center text-amber-300">TRPG-骨灰級骰子工具</h2>
-                <p class="text-center text-lg">歡迎使用這款為桌遊與 TRPG 玩家打造的網頁骰子工具！操作直觀，無論您是城主、遊戲主持人 (GM) 還是玩家，都能透過骰子工具獲得擲骰體驗。</p>
-                
+                <h2 class="text-3xl font-black text-center text-amber-300">${doc.title}</h2>
+                <p class="text-center text-lg">${doc.welcome}</p>
                 <div class="border-b border-gray-600 my-2"></div>
-
-                <h3 class="text-2xl font-bold text-amber-400">完整功能說明</h3>
-
+                <h3 class="text-2xl font-bold text-amber-400">${doc.featuresTitle}</h3>
                 <div>
-                    <h4 class="text-xl font-bold text-white mb-2">選單介面（左側控制欄）</h4>
+                    <h4 class="text-xl font-bold text-white mb-2">${doc.menuTitle}</h4>
                     <ul class="list-disc list-inside space-y-2 pl-4">
-                        <li><strong>模式切換：</strong> 在「單人模式」、「多人模式」與「說明文件」之間切換應用程式的主要功能。</li>
-                        <li><strong>音效開關：</strong> 點擊喇叭圖示，可以在「開啟音效」與「靜音」之間切換音效。</li>
+                        <li><strong>${doc.menuSwitch}</strong> ${doc.menuSwitchDesc}</li>
+                        <li><strong>${doc.menuAudio}</strong> ${doc.menuAudioDesc}</li>
                     </ul>
                 </div>
-
                 <div>
-                    <h4 class="text-xl font-bold text-white mb-2">單人模式</h4>
+                    <h4 class="text-xl font-bold text-white mb-2">${doc.singlePlayerTitle}</h4>
                     <ul class="list-disc list-inside space-y-2 pl-4">
-                        <li><strong>核心功能：</strong> 提供一個大型的個人擲骰面板，包含骰子表演區、總和顯示與數量控制。</li>
-                        <li><strong>更換骰子類型：</strong> 在「骰子表演區」<strong>長按</strong>（按住約半秒），即可彈出選單來更換骰子類型（D4, D6, D8, D10, D12, D20）。</li>
-                        <li><strong>歷史紀錄：</strong> 畫面右側會顯示詳細的擲骰歷史，並可輸入玩家名稱。</li>
-                        <li><strong>導出紀錄：</strong> 可將右側的擲骰歷史紀錄打包成一個 <strong>.txt</strong> 文字檔下載。</li>
+                        <li><strong>${doc.singlePlayerCore}</strong> ${doc.singlePlayerCoreDesc}</li>
+                        <li><strong>${doc.singlePlayerChangeDie}</strong> ${doc.singlePlayerChangeDieDesc}</li>
+                        <li><strong>${doc.singlePlayerHistory}</strong> ${doc.singlePlayerHistoryDesc}</li>
+                        <li><strong>${doc.singlePlayerExport}</strong> ${doc.singlePlayerExportDesc}</li>
                     </ul>
                 </div>
-
                 <div>
-                    <h4 class="text-xl font-bold text-white mb-2">多人模式</h4>
+                    <h4 class="text-xl font-bold text-white mb-2">${doc.multiPlayerTitle}</h4>
                     <ul class="list-disc list-inside space-y-2 pl-4">
-                        <li><strong>5+1 面板佈局：</strong> 包含 5 個玩家面板（含 1 個 GM）和 1 個共用的歷史紀錄面板。</li>
-                        <li><strong>獨立控制：</strong> 每個玩家面板都有獨立的名稱、骰子類型、數量控制與擲骰按鈕。</li>
-                        <li><strong>存檔與讀檔：</strong>
+                        <li><strong>${doc.multiPlayerLayout}</strong> ${doc.multiPlayerLayoutDesc}</li>
+                        <li><strong>${doc.multiPlayerControls}</strong> ${doc.multiPlayerControlsDesc}</li>
+                        <li><strong>${doc.multiPlayerSaveLoad}</strong>
                             <ul class="list-['-_'] list-inside pl-6 space-y-1 mt-1">
-                                <li><strong>導出紀錄：</strong> 點擊此按鈕，會將當前所有玩家的面板設定（名稱、骰子類型、數量等）與完整的歷史紀錄，打包成一個 <strong>.txt</strong> 存檔。</li>
-                                <li><strong>導入紀錄：</strong> 點擊此按鈕並選擇之前導出的存檔，即可完整還原整個遊戲場面，包含所有玩家設定與歷史紀錄。</li>
+                                <li><strong>${doc.multiPlayerExport}</strong> ${doc.multiPlayerExportDesc}</li>
+                                <li><strong>${doc.multiPlayerImport}</strong> ${doc.multiPlayerImportDesc}</li>
                             </ul>
                         </li>
                     </ul>
                 </div>
-
                 <div class="border-b border-gray-600 my-2"></div>
-
                 <div class="w-full flex flex-col items-center space-y-4">
-                    <h2 class="text-2xl font-bold text-amber-300">說明圖片</h2>
+                    <h2 class="text-2xl font-bold text-amber-300">${doc.imagesTitle}</h2>
                     <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
                         <img src="assets/Singleplayermode readme.png" alt="單人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Singleplayer+Mode+Readme.png';">
                     </div>
@@ -180,7 +303,9 @@
             </div>
             `;
         };
-            const updateUI = (playerId) => {
+        
+        // 更新 UI 顯示函式 (數量、骰子圖示、總和)
+        function updateUI(playerId) {
             const state = playerStates[playerId];
             if (!state) return;
             const qtyDisplay = document.getElementById(`quantity-display-${playerId}`);
@@ -190,7 +315,9 @@
             if (iconDisplay) iconDisplay.innerHTML = dieSVGs[state.dieType];
             if (sumDisplay) sumDisplay.textContent = state.sum;
         };
-        const createDieElement = (value, type) => {
+        
+        // 創建骰子元素函式
+        function createDieElement(value, type) {
             const dieFace = document.createElement('div');
             dieFace.className = 'w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center shadow-lg relative animate-roll-in';
             const svgIcon = document.createElement('div');
@@ -203,8 +330,11 @@
             dieFace.appendChild(numberText);
             return dieFace;
         };
-        const rollDice = (playerId) => {
+        
+        // 擲骰子函式
+        function rollDice(playerId) {
             const state = playerStates[playerId];
+            if (!state) return;
             const diceArea = document.getElementById(`dice-area-${playerId}`);
             if (!diceArea) return;
             diceArea.innerHTML = '';
@@ -224,19 +354,25 @@
             });
             addHistoryEntry(playerId, totalSum, results, state.dieType, state.quantity);
         };
-        const addHistoryEntry = (playerId, total, diceResults, dieType, qty) => {
+        
+        // 添加歷史紀錄條目
+        function addHistoryEntry(playerId, total, diceResults, dieType, qty) {
             if (!historyLogContainer) return;
-            const username = playerStates[playerId].name.trim() || '玩家';
+            const state = playerStates[playerId];
+            if (!state) return;
+            const username = state.name.trim() || languageData.multiPlayer.defaultPlayerName;
             const diceInfo = `${qty}d${dieType}`;
             const resultString = `[${diceResults.join(', ')}]`;
             const logText = `【${username}_${diceInfo}】: ${total} → ${resultString}`;
             historyData.push(logText);
             const entry = document.createElement('div');
             entry.className = 'bg-gray-800/80 p-2 rounded-lg text-xs';
-            entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${username}</span><span class="text-amber-300"> 擲出 ${diceInfo}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${resultString}</p></div><span class="text-2xl font-bold">${total}</span></div>`;
+            entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${username}</span><span class="text-amber-300"> ${languageData.system.rolled} ${diceInfo}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${resultString}</p></div><span class="text-2xl font-bold">${total}</span></div>`;
             historyLogContainer.prepend(entry);
         };
-        const exportState = () => {
+        
+        // 導出狀態函式
+        function exportState() {
             playSound(buttonSound);
             let filename = `dice_log_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
             let dataToExport;
@@ -248,7 +384,7 @@
                 filename = `dice_session_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
             }
             if (dataToExport.length === 0 && currentMode === 'single') {
-                alert("目前沒有任何擲骰紀錄可供導出。");
+                alert(languageData.system.exportEmpty);
                 return;
             }
             const blob = new Blob([dataToExport], { type: 'text/plain;charset=utf-8' });
@@ -260,7 +396,9 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(a.href);
         };
-        const importState = (file) => {
+        
+        // 導入狀態函式
+        function importState(file) {
             playSound(buttonSound);
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -271,25 +409,27 @@
                         historyData = importedData.history;
                         renderUIForCurrentMode(true);
                     } else {
-                        alert('導入失敗：檔案格式不正確。');
+                        alert(languageData.system.importInvalidFormat);
                     }
                 } catch (error) {
-                    alert('導入失敗：檔案不是有效的JSON格式。');
-                    console.error("導入錯誤:", error);
+                    alert(languageData.system.importInvalidJSON);
+                    console.error(languageData.system.importErrorConsole, error);
                 }
             };
             reader.readAsText(file);
         };
-        const setupPressAndHold = (element) => {
+        
+        // 設置長按事件處理函式
+        function setupPressAndHold(element) {
             const clearPressTimer = () => {
                 clearTimeout(pressTimer);
                 pressTimer = null;
             };
             element.addEventListener('pointerdown', (e) => {
                 if (e.pointerType === 'mouse' && e.button !== 0) return;
-                const panel = e.target.closest('.player-panel, div[data-player]');
-                if (!panel) return;
-                const playerId = panel.dataset.player;
+                const targetElement = e.target.closest('[data-player]');
+                if (!targetElement) return;
+                const playerId = targetElement.dataset.player;
                 clearPressTimer(); 
                 pressTimer = window.setTimeout(() => { openModal(playerId); }, 500);
             });
@@ -298,16 +438,22 @@
             element.addEventListener('pointerleave', clearPressTimer);
             element.addEventListener('contextmenu', (e) => e.preventDefault());
         };
-        const openModal = (playerId) => {
+        
+        // 開啟模態框函式
+        function openModal(playerId) {
             globalState.activePlayerIdForModal = playerId;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         };
-        const closeModal = () => {
+        
+        // 關閉模態框函式
+        function closeModal() {
             modal.classList.remove('flex');
             modal.classList.add('hidden');
         };
-        const populateDiceOptions = () => {
+        
+        // 填充骰子選項到模態框
+        function populateDiceOptions() {
             diceTypeOptionsContainer.innerHTML = '';
             Object.keys(dieSVGs).forEach(type => {
                 const button = document.createElement('button');
@@ -318,15 +464,18 @@
             });
         };
 
-        const renderUIForCurrentMode = (isImport = false) => {
-            mainContentContainer.innerHTML = '';
-            if (!isImport) {
+        // 渲染當前模式的 UI
+        function renderUIForCurrentMode(isImport = false, switchingMode = false) {
+            const currentScrollTop = mainContentContainer.scrollTop; // 記錄滾動位置
+
+            mainContentContainer.innerHTML = ''; // 清空主內容區域
+            // 如果是切換模式（非導入），則重置歷史紀錄和玩家狀態
+            if (switchingMode) {
                 historyData = [];
-                if (currentMode !== 'docs') {
-                    playerStates = {};
-                }
+                playerStates = {};
             }
             
+            // 更新模式按鈕的樣式
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.remove('bg-amber-600', 'text-white');
                 btn.classList.add('bg-gray-700', 'text-gray-400');
@@ -337,51 +486,70 @@
                 activeBtn.classList.remove('bg-gray-700', 'text-gray-400');
             }
 
+            // 更新所有靜態文字內容
+            document.title = languageData.common.pageTitle;
+            document.getElementById('tool-title').textContent = languageData.common.toolTitle;
+            document.getElementById('single-mode-btn').textContent = languageData.common.singleMode;
+            document.getElementById('multi-mode-btn').textContent = languageData.common.multiMode;
+            document.getElementById('docs-mode-btn').textContent = languageData.common.docs;
+            document.getElementById('made-by-link').textContent = languageData.common.madeBy;
+            document.getElementById('modal-title').textContent = languageData.common.selectDieType;
+
+            // 根據模式渲染 UI
             switch (currentMode) {
                 case 'single':
                     mainContentContainer.className = 'flex-1 p-4 overflow-hidden';
+                    // 如果玩家狀態為空，則初始化單人玩家狀態
                     if (Object.keys(playerStates).length === 0) {
-                         playerStates = { 'player1': { name: '玩家', dieType: 6, quantity: 1, sum: 0 } };
+                         playerStates = { 'player1': { name: languageData.singlePlayer.usernamePlaceholder.replace('...', '').trim(), dieType: 6, quantity: 1, sum: 0 } };
                     }
                     mainContentContainer.innerHTML = createSinglePlayerUI();
                     historyLogContainer = document.getElementById('history-log');
                     const nameInput = document.querySelector('[data-action="change-name"]');
                     nameInput.value = playerStates['player1'].name;
-                    setupPressAndHold(document.getElementById('dice-area-player1'));
+                    nameInput.placeholder = languageData.singlePlayer.usernamePlaceholder;
+                    setupPressAndHold(document.getElementById('dice-area-player1')); // 設置長按事件
                     updateUI('player1');
                     break;
                 case 'multi':
                     mainContentContainer.className = 'flex-1 p-4 gap-4 grid grid-cols-3 grid-rows-2 overflow-hidden';
+                    // 如果玩家狀態為空，則初始化多個玩家狀態
                     if (Object.keys(playerStates).length === 0) {
                         playerStates = {
-                            'gm': { name: 'GM', dieType: 6, quantity: 7, sum: 0 },
-                            'player1': { name: '玩家1', dieType: 6, quantity: 8, sum: 0 },
-                            'player2': { name: '玩家2', dieType: 6, quantity: 7, sum: 0 },
-                            'player3': { name: '玩家3', dieType: 6, quantity: 7, sum: 0 },
-                            'player4': { name: '玩家4', dieType: 6, quantity: 7, sum: 0 },
+                            'gm': { name: languageData.multiPlayer.defaultGMName, dieType: 6, quantity: 7, sum: 0 },
+                            'player1': { name: `${languageData.multiPlayer.defaultPlayerName} 1`, dieType: 6, quantity: 8, sum: 0 },
+                            'player2': { name: `${languageData.multiPlayer.defaultPlayerName} 2`, dieType: 6, quantity: 7, sum: 0 },
+                            'player3': { name: `${languageData.multiPlayer.defaultPlayerName} 3`, dieType: 6, quantity: 7, sum: 0 },
+                            'player4': { name: `${languageData.multiPlayer.defaultPlayerName} 4`, dieType: 6, quantity: 7, sum: 0 },
                         };
                     }
                     
                     const playerIds = Object.keys(playerStates);
-                    playerIds.forEach(pId => mainContentContainer.appendChild(createPlayerPanel(pId)));
-                    mainContentContainer.appendChild(createHistoryPanel());
+                    playerIds.forEach(pId => {
+                        const panel = createPlayerPanel(pId);
+                        if(panel) mainContentContainer.appendChild(panel);
+                    });
+                    const historyPanel = createHistoryPanel();
+                    if(historyPanel) mainContentContainer.appendChild(historyPanel);
+                    
                     historyLogContainer = document.getElementById('history-log');
                     
+                    // 倒序填充歷史紀錄
                     historyData.slice().reverse().forEach(logText => {
                         const parts = logText.match(/【(.*?)_(.*?)】: (.*?) → (\[.*\])/);
                         if(!parts) return;
                         const entry = document.createElement('div');
                         entry.className = 'bg-gray-800/80 p-2 rounded-lg text-xs';
-                        entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${parts[1]}</span><span class="text-amber-300"> 擲出 ${parts[2]}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${parts[4]}</p></div><span class="text-2xl font-bold">${parts[3]}</span></div>`;
+                        entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${parts[1]}</span><span class="text-amber-300"> ${languageData.system.rolled} ${parts[2]}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${parts[4]}</p></div><span class="text-2xl font-bold">${parts[3]}</span></div>`;
                         historyLogContainer.append(entry);
                     });
 
                     playerIds.forEach(pId => {
                         const diceArea = document.getElementById(`dice-area-${pId}`);
-                        if (diceArea) setupPressAndHold(diceArea);
+                        if (diceArea) setupPressAndHold(diceArea); // 設置長按事件
                         updateUI(pId);
-                        const nameInput = document.querySelector(`#panel-${pId} [data-action="change-name"]`);
-                        if(nameInput) nameInput.value = playerStates[pId].name;
+                        const nameInputMulti = document.querySelector(`#panel-${pId} [data-action="change-name"]`);
+                        if(nameInputMulti) nameInputMulti.value = playerStates[pId].name;
                     });
                     break;
                 case 'docs':
@@ -389,77 +557,134 @@
                     mainContentContainer.innerHTML = createDocsUI();
                     break;
             }
+            mainContentContainer.scrollTop = currentScrollTop; // 恢復滾動位置
         };
 
-        singleModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'single') { currentMode = 'single'; renderUIForCurrentMode(); }});
-        multiModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'multi') { currentMode = 'multi'; renderUIForCurrentMode(); }});
-        docsModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'docs') { currentMode = 'docs'; renderUIForCurrentMode(); }});
-        soundToggleBtn.addEventListener('click', () => { globalState.isMuted = !globalState.isMuted; updateSoundToggleIcon(); if (!globalState.isMuted) playSound(buttonSound); });
-        
-        importFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) { importState(file); }
-            e.target.value = '';
-        });
-
-        document.body.addEventListener('click', (e) => {
-            const target = e.target.closest('[data-action]');
-            if (!target) return;
-            
-            const action = target.dataset.action;
-            const playerId = target.dataset.player;
-
-            if(['increase-qty', 'decrease-qty', 'clear-history', 'open-modal'].includes(action)){
-                 playSound(buttonSound);
-            }
-            if(action === 'roll'){
-                playSound(buttonSound);
-                playRandomRollSound();
-            }
-
-            switch(action) {
-                case 'import-history':
-                    if (currentMode === 'multi') { importFileInput.click(); } 
-                    else { alert("導入功能僅限多人模式使用。"); }
+        // 初始化應用程式
+        function initializeApp() {
+            // 字體切換下拉選單事件
+            fontDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 防止點擊按鈕時觸發 document 的點擊事件
+                fontDropdownMenu.classList.toggle('hidden');
+                langDropdownMenu.classList.add('hidden'); // 關閉語言選單
+            });
+            fontDropdownMenu.addEventListener('click', (e) => {
+                if (e.target.dataset.font) {
                     playSound(buttonSound);
-                    break;
-                case 'export-history':
-                    exportState();
-                    break;
-                case 'increase-qty': if (playerStates[playerId] && playerStates[playerId].quantity < globalState.maxQty) { playerStates[playerId].quantity++; updateUI(playerId); } break;
-                case 'decrease-qty': if (playerStates[playerId] && playerStates[playerId].quantity > globalState.minQty) { playerStates[playerId].quantity--; updateUI(playerId); } break;
-                case 'roll': if (playerStates[playerId]) rollDice(playerId); break;
-                case 'clear-history': if (historyLogContainer) historyLogContainer.innerHTML = ''; historyData = []; break;
-            }
-        });
-        
-        document.body.addEventListener('input', (e) => {
-            const target = e.target.closest('[data-action="change-name"]');
-            if(target){
-                const playerId = target.dataset.player;
-                if (playerStates[playerId]) { playerStates[playerId].name = target.value; }
-            }
-        });
-        
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-        
-        diceTypeOptionsContainer.addEventListener('click', (e) => {
-            const button = e.target.closest('button');
-            if (button && button.dataset.type) {
-                playSound(buttonSound);
-                const playerId = globalState.activePlayerIdForModal;
-                if (playerId && playerStates[playerId]) {
-                    playerStates[playerId].dieType = parseInt(button.dataset.type, 10);
-                    updateUI(playerId);
+                    setFont(e.target.dataset.font);
+                    fontDropdownMenu.classList.add('hidden');
                 }
-                closeModal();
-            }
-        });
+            });
 
-        const initializeApp = () => {
-            populateDiceOptions();
-            updateSoundToggleIcon();
-            renderUIForCurrentMode();
+            // 語言切換下拉選單事件
+            langDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 防止點擊按鈕時觸發 document 的點擊事件
+                langDropdownMenu.classList.toggle('hidden');
+                fontDropdownMenu.classList.add('hidden'); // 關閉字體選單
+            });
+            langDropdownMenu.addEventListener('click', (e) => {
+                if (e.target.dataset.lang) {
+                    playSound(buttonSound);
+                    setLanguage(e.target.dataset.lang);
+                    langDropdownMenu.classList.add('hidden');
+                }
+            });
+
+            // 點擊頁面其他地方關閉下拉選單
+            document.addEventListener('click', (e) => {
+                if (langDropdownMenu && !langDropdownBtn.contains(e.target) && !langDropdownMenu.contains(e.target)) {
+                    langDropdownMenu.classList.add('hidden');
+                }
+                if (fontDropdownMenu && !fontDropdownBtn.contains(e.target) && !fontDropdownMenu.contains(e.target)) {
+                    fontDropdownMenu.classList.add('hidden');
+                }
+            });
+            
+            // 模式切換按鈕事件
+            singleModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'single') { currentMode = 'single'; localStorage.setItem('currentMode', currentMode); renderUIForCurrentMode(false, true); }});
+            multiModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'multi') { currentMode = 'multi'; localStorage.setItem('currentMode', currentMode); renderUIForCurrentMode(false, true); }});
+            docsModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'docs') { currentMode = 'docs'; localStorage.setItem('currentMode', currentMode); renderUIForCurrentMode(false, true); }});
+            
+            // 音效開關按鈕事件
+            soundToggleBtn.addEventListener('click', () => { globalState.isMuted = !globalState.isMuted; localStorage.setItem('isMuted', globalState.isMuted); updateSoundToggleIcon(); if (!globalState.isMuted) playSound(buttonSound); });
+            
+            // 導入檔案輸入框事件
+            importFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) { importState(file); }
+                e.target.value = '';
+            });
+
+            // 全局點擊事件處理
+            document.body.addEventListener('click', (e) => {
+                const target = e.target.closest('[data-action]');
+                if (!target) return;
+                
+                const action = target.dataset.action;
+                const playerId = target.dataset.player;
+
+                // 播放音效
+                if(['increase-qty', 'decrease-qty', 'clear-history', 'import-history'].includes(action)){
+                     playSound(buttonSound);
+                }
+                if(action === 'roll'){
+                    playSound(buttonSound);
+                    playRandomRollSound();
+                }
+
+                // 處理動作
+                switch(action) {
+                    case 'import-history':
+                        if (currentMode === 'multi') { importFileInput.click(); } 
+                        else { alert(languageData.system.importForMultiOnly); }
+                        break;
+                    case 'export-history':
+                        exportState();
+                        break;
+                    case 'increase-qty': if (playerStates[playerId] && playerStates[playerId].quantity < globalState.maxQty) { playerStates[playerId].quantity++; updateUI(playerId); } break;
+                    case 'decrease-qty': if (playerStates[playerId] && playerStates[playerId].quantity > globalState.minQty) { playerStates[playerId].quantity--; updateUI(playerId); } break;
+                    case 'roll': if (playerStates[playerId]) rollDice(playerId); break;
+                    case 'clear-history': if (historyLogContainer) historyLogContainer.innerHTML = ''; historyData = []; break;
+                }
+            });
+            
+            // 輸入框變更名稱事件
+            document.body.addEventListener('input', (e) => {
+                const target = e.target.closest('[data-action="change-name"]');
+                if(target){
+                    const playerId = target.dataset.player;
+                    if (playerStates[playerId]) { playerStates[playerId].name = target.value; }
+                }
+            });
+            
+            // 模態框點擊外部關閉
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+            
+            // 骰子類型選項點擊事件
+            diceTypeOptionsContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if (button && button.dataset.type) {
+                    playSound(buttonSound);
+                    const playerId = globalState.activePlayerIdForModal;
+                    if (playerId && playerStates[playerId]) {
+                        playerStates[playerId].dieType = parseInt(button.dataset.type, 10);
+                        updateUI(playerId);
+                    }
+                    closeModal();
+                }
+            });
+
+            // 載入 localStorage 設定
+            globalState.isMuted = localStorage.getItem('isMuted') === 'true';
+            currentMode = localStorage.getItem('currentMode') || 'multi';
+            currentLang = localStorage.getItem('language') || 'zh-TW';
+            currentFont = localStorage.getItem('font') || 'NotoSansTC';
+
+            // 初始化各項功能
+            populateDiceOptions(); // 填充骰子選項
+            updateSoundToggleIcon(); // 設定初始音效圖示
+            setLanguage(currentLang); // 設定初始語言並渲染 UI
+            setFont(currentFont); // 設定初始字體
         };
         
         initializeApp();
