@@ -3,14 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">TRPG-Diceroller-V1.3.0</title>
-    <!-- 假設 tailwind.js 存在於 js/ 資料夾中，用於離線 Tailwind CSS -->
-    <script src="js/tailwind.js"></script> 
+    <title id="page-title">TRPG-Diceroller-V1.7.0</title>
+    <!-- 使用 CDN 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script> 
     <!-- 動態載入字體規則的 style 標籤 -->
     <style id="dynamic-font-rules"></style> 
     <style>
+        :root {
+            --dice-size: 48px; /* 骰子大小預設值 (中) */
+        }
+
+        /* 預設深色主題 */
+        :root, :root[data-theme="dark"] {
+        --color-bg-main: #1f2937;
+        --color-bg-panel: #111827cc;
+        --color-bg-panel-light: #11182799;
+        --color-bg-box: #374151cc;
+        --color-bg-btn: #f59e42;
+        --color-bg-btn-hover: #fbbf24;
+        --color-bg-btn-active: #b45309;
+        --color-bg-modal: #374151;
+        --color-bg-modal-overlay: rgba(0,0,0,0.7);
+        --color-bg-scrollbar-track: rgba(0,0,0,0.1);
+        --color-bg-scrollbar-thumb: #4a5568;
+        --color-bg-scrollbar-thumb-hover: #718096;
+        --color-text-main: #fff;
+        --color-text-sub: #e5e7eb;
+        --color-text-muted: #9ca3af;
+        --color-text-placeholder: #6b7280;
+        --color-text-title: #fbbf24;
+        --color-text-highlight: #fbbf24;
+        --color-text-btn: #fff;
+        --color-text-danger: #f87171;
+        --color-text-danger-hover: #fca5a5;
+        --color-text-link: #6366f1;
+        --color-text-link-hover: #818cf8;
+        --color-text-success: #22c55e;
+        --color-text-success-hover: #4ade80;
+        --color-border-main: #4b5563cc;
+        --color-border-box: #6b7280cc;
+        }
+
+        /* 暗色主題 */
+        :root[data-theme="darkred"] {
+            --color-bg-main: #1e1e1e;
+            --color-bg-panel: #252526cc;
+            --color-bg-panel-light: #25252699;
+            --color-bg-box: #2d2d30cc;
+            --color-bg-btn: #856565;
+            --color-bg-btn-hover: #aa5959;
+            --color-bg-btn-active: #3c3c3c;
+            --color-bg-modal: #2d2d30;
+            --color-text-main: #d4d4d4;
+            --color-text-sub: #808080;
+            --color-text-muted: #808080;
+            --color-text-placeholder: #808080;
+            --color-text-title: #d4d4d4;
+            --color-text-highlight: #856565;
+            --color-text-danger: #f44747;
+            --color-text-danger-hover: #ff5a5a;
+            --color-text-link: #569cd6;
+            --color-text-link-hover: #569cd6;
+            --color-text-success: #569cd6;
+            --color-text-success-hover: #569cd6;
+            --color-border-main: #3c3c3ccc;
+            --color-border-box: #1e1e1ecc;
+        }
+
+        /* 金色主題 */
+        :root[data-theme="gold"] {
+            --color-bg-main: #2b2204;
+            --color-bg-panel: #2a2a2acc;
+            --color-bg-panel-light: #2a2a2a99;
+            --color-bg-box: #3b3b3bcc;
+            --color-bg-btn: #bd7b18;
+            --color-bg-btn-hover: #bfa034;
+            --color-bg-btn-active: #4e4e4e;
+            --color-bg-modal: #3b3b3b;
+            --color-text-main: #f5f5dc;
+            --color-text-sub: #c0c0c0;
+            --color-text-muted: #c0c0c0;
+            --color-text-placeholder: #c0c0c0;
+            --color-text-title: #f5f5dc;
+            --color-text-highlight: #bd7b18;
+            --color-text-danger: #8b0000;
+            --color-text-danger-hover: #a60000;
+            --color-text-link: #4682b4;
+            --color-text-link-hover: #4682b4;
+            --color-text-success: #4682b4;
+            --color-text-success-hover: #4682b4;
+            --color-border-main: #4e4e4ecc;
+            --color-border-box: #362f23cc;
+        }
+
+        /* 摩卡主題 */
+        :root[data-theme="mocha"] {
+            --color-bg-main: #3b2e2a;
+            --color-bg-panel: #4a3b35cc;
+            --color-bg-panel-light: #4a3b3599;
+            --color-bg-box: #5a4740cc;
+            --color-bg-btn: #d1a060;
+            --color-bg-btn-hover: #e1b070;
+            --color-bg-btn-active: #6b574e;
+            --color-bg-modal: #5a4740;
+            --color-text-main: #f8f3ed;
+            --color-text-sub: #cfc5ba;
+            --color-text-muted: #cfc5ba;
+            --color-text-placeholder: #cfc5ba;
+            --color-text-title: #f8f3ed;
+            --color-text-highlight: #d1a060;
+            --color-text-danger: #963e3e;
+            --color-text-danger-hover: #b05151;
+            --color-text-link: #7aa4c2;
+            --color-text-link-hover: #7aa4c2;
+            --color-text-success: #7aa4c2;
+            --color-text-success-hover: #7aa4c2;
+            --color-border-main: #6b574ecc;
+            --color-border-box: #443731cc;
+        }
+
+        /* 鄉民主題 */
+        :root[data-theme="ptt"] {
+            --color-bg-main: #181818;
+            --color-bg-panel: #181818cc;
+            --color-bg-panel-light: #18181899;
+            --color-bg-box: #242424cc;
+            --color-bg-btn: #260ac7;
+            --color-bg-btn-hover: #3d6dc5;
+            --color-bg-btn-active: #858585;
+            --color-bg-modal: #242424;
+            --color-text-main: #f9cc49;
+            --color-text-sub: #808080;
+            --color-text-muted: #808080;
+            --color-text-placeholder: #808080;
+            --color-text-title: #f9cc49;
+            --color-text-highlight: #260ac7;
+            --color-text-danger: #d93025;
+            --color-text-danger-hover: #ea4335;
+            --color-text-link: #1a73e8;
+            --color-text-link-hover: #1a73e8;
+            --color-text-success: #1a73e8;
+            --color-text-success-hover: #1a73e8;
+            --color-border-main: #858585cc;
+            --color-border-box: #f5f5f5cc;
+        }
+
+        /* 青綠色克蘇魯主題 */
+        :root[data-theme="Cthulhu"] {
+            --color-bg-main: #0d1b2a; 
+            --color-bg-panel: #1b263bcc; 
+            --color-bg-panel-light: #2a4b5799; 
+            --color-bg-box: #003c43cc; 
+            --color-bg-btn: #00a896; 
+            --color-bg-btn-hover: #00c4a7; 
+            --color-bg-btn-active: #48d8b9; 
+            --color-bg-modal: #0b131a; 
+            --color-text-main: #e0e1dd; 
+            --color-text-sub: #8d99ae; 
+            --color-text-muted: #8d99ae; 
+            --color-text-placeholder: #4f6d7a; 
+            --color-text-title: #4cc9f0; 
+            --color-text-highlight: #00a896; 
+            --color-text-danger: #e55a5a; 
+            --color-text-danger-hover: #f07167; 
+            --color-text-link: #61a5c2; 
+            --color-text-link-hover: #8ecae6; 
+            --color-text-success: #40c057; 
+            --color-text-success-hover: #69db7c; 
+            --color-border-main: #2a4b57cc; 
+            --color-border-box: #4f6d7acc; 
+        }
+
         /* 基礎樣式 */
-        body { -webkit-tap-highlight-color: transparent; }
+        body { -webkit-tap-highlight-color: transparent; background: var(--color-bg-main); color: var(--color-text-main); font-family: 'Noto Sans TC', 'Inter', sans-serif; }
         @keyframes roll-in {
             0% { transform: scale(0.5) rotate(-180deg) translateY(-50px); opacity: 0; }
             80% { transform: scale(1.1) rotate(10deg); opacity: 1; }
@@ -19,57 +184,116 @@
         .animate-roll-in { animation: roll-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         button, [role="button"], a { cursor: pointer; }
         .history-log::-webkit-scrollbar { width: 6px; }
-        .history-log::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        .history-log::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 10px; }
-        .history-log::-webkit-scrollbar-thumb:hover { background: #718096; }
-        /* 下拉選單的過渡效果 */
-        .dropdown-menu { transition: opacity 0.2s ease, transform 0.2s ease; }
+        .history-log::-webkit-scrollbar-track { background: var(--color-bg-scrollbar-track); border-radius: 10px; }
+        .history-log::-webkit-scrollbar-thumb { background: var(--color-bg-scrollbar-thumb); border-radius: 10px; }
+        .history-log::-webkit-scrollbar-thumb:hover { background: var(--color-bg-scrollbar-thumb-hover); }
+        
+        /* 顏色覆蓋 (使用變數) */
+        .bg-main { background-color: var(--color-bg-main) !important; }
+        .bg-panel { background-color: var(--color-bg-panel) !important; }
+        .bg-panel-light { background-color: var(--color-bg-panel-light) !important; }
+        .bg-box { background-color: var(--color-bg-box) !important; }
+        .bg-btn { background-color: var(--color-bg-btn) !important; }
+        .hover\\:bg-btn-hover:hover { background-color: var(--color-bg-btn-hover) !important; }
+        .active\\:bg-btn-active:active { background-color: var(--color-bg-btn-active) !important; }
+        .bg-link { background-color: var(--color-text-link) !important; }
+        .hover\\:bg-link-hover:hover { background-color: var(--color-text-link-hover) !important; }
+        .bg-success { background-color: var(--color-text-success) !important; }
+        .hover\\:bg-success-hover:hover { background-color: var(--color-text-success-hover) !important; }
+        .text-main { color: var(--color-text-main) !important; }
+        .text-sub { color: var(--color-text-sub) !important; }
+        .text-muted { color: var(--color-text-muted) !important; }
+        .text-placeholder { color: var(--color-text-placeholder) !important; }
+        .placeholder-color::placeholder { color: var(--color-text-placeholder) !important; }
+        .text-title { color: var(--color-text-title) !important; }
+        .text-highlight { color: var(--color-text-highlight) !important; }
+        .text-danger { color: var(--color-text-danger) !important; }
+        .hover\\:text-danger-hover:hover { color: var(--color-text-danger-hover) !important; }
+        .border-main { border-color: var(--color-border-main) !important; }
+        .border-box { border-color: var(--color-border-box) !important; }
+        .focus\\:border-link-hover:focus { border-color: var(--color-text-link-hover) !important; }
+        .text-highlight, .text-title, .bg-btn { font-weight: bold; }
+
+        /* 滑桿樣式 */
+        input[type=range] { appearance: none; -webkit-appearance: none; background: transparent; width: 100%; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: var(--color-bg-box); border-radius: 5px; border: 1px solid var(--color-border-box); }
+        input[type=range]::-webkit-slider-thumb { border: 2px solid var(--color-bg-main); height: 20px; width: 20px; border-radius: 50%; background: var(--color-text-highlight); cursor: pointer; appearance: none; -webkit-appearance: none; margin-top: -7px; }
+        input[type=range]::-moz-range-track { width: 100%; height: 8px; cursor: pointer; background: var(--color-bg-box); border-radius: 5px; border: 1px solid var(--color-border-box); }
+        input[type=range]::-moz-range-thumb { border: 2px solid var(--color-bg-main); height: 20px; width: 20px; border-radius: 50%; background: var(--color-text-highlight); cursor: pointer; }
+        
+        /* 自定義下拉選單 */
+        .custom-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='3' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25em; }
     </style>
 </head>
-<body class="bg-gray-800 text-white select-none overflow-hidden h-screen flex">
+<body class="bg-main text-main select-none overflow-hidden h-screen flex">
+
+    <!-- 設定模態框 -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4 transition-opacity duration-300">
+        <div class="bg-modal w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-6" style="background-color: var(--color-bg-modal);">
+            <h3 id="settings-title" class="text-2xl font-bold text-center text-title"></h3>
+            
+            <div class="grid grid-cols-3 items-center gap-4">
+                <label id="theme-label" for="theme-select" class="font-bold text-sub text-lg"></label>
+                <select id="theme-select" class="col-span-2 custom-select bg-box border border-box text-main text-lg rounded-lg focus:ring-highlight focus:border-highlight block w-full p-2.5" style="background-color: var(--color-bg-box); border-color: var(--color-border-box); color: var(--color-text-main);"></select>
+            </div>
+
+            <div class="grid grid-cols-3 items-center gap-4">
+                <label id="language-label" for="language-select" class="font-bold text-sub text-lg"></label>
+                <select id="language-select" class="col-span-2 custom-select bg-box border border-box text-main text-lg rounded-lg focus:ring-highlight focus:border-highlight block w-full p-2.5" style="background-color: var(--color-bg-box); border-color: var(--color-border-box); color: var(--color-text-main);"></select>
+            </div>
+
+            <div class="grid grid-cols-3 items-center gap-4">
+                <label id="font-label" for="font-select" class="font-bold text-sub text-lg"></label>
+                <select id="font-select" class="col-span-2 custom-select bg-box border border-box text-main text-lg rounded-lg focus:ring-highlight focus:border-highlight block w-full p-2.5" style="background-color: var(--color-bg-box); border-color: var(--color-border-box); color: var(--color-text-main);"></select>
+            </div>
+
+            <div class="grid grid-cols-3 items-center gap-4">
+                <label id="sound-label" class="font-bold text-sub text-lg"></label>
+                <button id="sound-toggle-btn" class="col-span-2 bg-box border border-box text-main font-bold py-2 px-4 rounded-lg flex items-center justify-center" style="background-color: var(--color-bg-box); border-color: var(--color-border-box); color: var(--color-text-main);"></button>
+            </div>
+            
+            <div class="grid grid-cols-3 items-center gap-4">
+                <label id="dice-size-label" for="dice-size-slider" class="font-bold text-sub text-lg"></label>
+                <div class="col-span-2 flex items-center gap-2">
+                    <input id="dice-size-slider" type="range" min="32" max="64" step="16" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+                    <span id="dice-size-value" class="font-bold text-muted w-12 text-center"></span>
+                </div>
+            </div>
+
+            <button id="close-settings-btn" class="w-full bg-btn hover:bg-btn-hover active:bg-btn-active text-btn font-bold py-3 px-4 rounded-xl text-xl transition-colors"></button>
+        </div>
+    </div>
 
     <!-- 骰子類型選擇模態框 -->
     <div id="dice-type-modal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50 p-4 transition-opacity duration-300">
-        <div class="bg-gray-700 rounded-2xl p-6 shadow-2xl w-full max-w-xs">
-            <h3 id="modal-title" class="text-xl mb-6 text-center font-bold text-gray-200"></h3>
+        <div class="bg-box rounded-2xl p-6 shadow-2xl w-full max-w-xs" style="background-color: var(--color-bg-box);">
+            <h3 id="modal-title" class="text-xl mb-6 text-center font-bold text-sub"></h3>
             <div id="dice-type-options" class="grid grid-cols-3 gap-4"></div>
         </div>
     </div>
 
     <!-- 控制側邊欄 -->
-    <div id="control-sidebar" class="w-48 bg-gray-900/60 p-4 flex flex-col">
-        <h1 id="tool-title" class="text-xl font-black text-center text-amber-300"></h1>
+    <div id="control-sidebar" class="w-48 bg-panel p-4 flex flex-col">
+        <h1 id="tool-title" class="text-xl font-black text-center text-title"></h1>
         <div class="flex-grow flex flex-col space-y-2 mt-4">
-            <!-- 模式按鈕 -->
             <button id="single-mode-btn" data-mode="single" class="mode-btn w-full py-3 rounded-lg font-bold text-xl transition-colors"></button>
             <button id="multi-mode-btn" data-mode="multi" class="mode-btn w-full py-3 rounded-lg font-bold text-xl transition-colors"></button>
             <button id="docs-mode-btn" data-mode="docs" class="mode-btn w-full py-3 rounded-lg font-bold text-xl transition-colors"></button>
         </div>
         
-        <!-- 字體切換器 -->
-        <div id="font-switcher" class="relative mb-2">
-            <button id="font-dropdown-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-lg font-bold"></button>
-            <div id="font-dropdown-menu" class="hidden dropdown-menu absolute bottom-full left-0 w-full mb-1 bg-gray-600 rounded-lg shadow-lg">
-            </div>
-        </div>
+        <!-- 設定漢堡選單按鈕 -->
+        <button id="settings-btn" class="w-full h-12 flex items-center justify-center bg-box rounded-lg text-muted hover:text-main transition-colors mb-2" style="background-color: var(--color-bg-box); color: var(--color-text-muted);">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
 
-        <!-- 語系切換器 -->
-        <div id="lang-switcher" class="relative mb-2">
-            <button id="lang-dropdown-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-lg font-bold"></button>
-            <div id="lang-dropdown-menu" class="hidden dropdown-menu absolute bottom-full left-0 w-full mb-1 bg-gray-600 rounded-lg shadow-lg">
-            </div>
-        </div>
-
-        <!-- 音效開關按鈕 -->
-        <button id="sound-toggle-btn" class="w-full h-12 flex items-center justify-center bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors"></button>
         <!-- 製作者連結 -->
-        <a id="made-by-link" href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mt-2 text-center text-base text-gray-500 hover:text-amber-300 transition-colors no-underline">
-        </a>
+        <a id="made-by-link" href="https://portaly.cc/tangledkai_2.0" target="_blank" rel="noopener noreferrer" class="mt-2 text-center text-base text-muted hover:text-title transition-colors no-underline"></a>
     </div>
 
     <!-- 主要內容區域 -->
     <div id="main-content" class="flex-1 p-4"></div>
-    <!-- 隱藏的檔案輸入框，用於導入功能 -->
+    <!-- 隱藏的檔案輸入框 -->
     <input type="file" id="import-file-input" class="hidden" accept=".txt,.json">
 
     <script>
@@ -81,98 +305,174 @@
         const singleModeBtn = document.getElementById('single-mode-btn');
         const multiModeBtn = document.getElementById('multi-mode-btn');
         const docsModeBtn = document.getElementById('docs-mode-btn');
-        const soundToggleBtn = document.getElementById('sound-toggle-btn');
         const importFileInput = document.getElementById('import-file-input');
-        const fontRulesStyleTag = document.getElementById('dynamic-font-rules'); // 用於動態載入字體規則
+        const fontRulesStyleTag = document.getElementById('dynamic-font-rules');
         
-        const langDropdownBtn = document.getElementById('lang-dropdown-btn'); // 語系切換按鈕
-        const langDropdownMenu = document.getElementById('lang-dropdown-menu'); // 語系切換選單
-        const fontDropdownBtn = document.getElementById('font-dropdown-btn'); // 字體切換按鈕
-        const fontDropdownMenu = document.getElementById('font-dropdown-menu'); // 字體切換選單
+        // 新增設定介面元素
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeSettingsBtn = document.getElementById('close-settings-btn');
+        const themeSelect = document.getElementById('theme-select');
+        const languageSelect = document.getElementById('language-select');
+        const fontSelect = document.getElementById('font-select');
+        const soundToggleBtn = document.getElementById('sound-toggle-btn');
+        const diceSizeSlider = document.getElementById('dice-size-slider');
+        const diceSizeValue = document.getElementById('dice-size-value');
 
-        let historyLogContainer; // 擲骰紀錄容器，動態設定
+        let historyLogContainer;
 
         // 全域狀態變數
-        let currentMode = localStorage.getItem('currentMode') || 'multi'; // 從 localStorage 載入模式
+        let currentMode = 'multi';
         let playerStates = {};
         let globalState = { minQty: 1, maxQty: 32, isMuted: false, activePlayerIdForModal: null };
         let historyData = [];
-        let pressTimer = null; // 長按計時器
+        let pressTimer = null;
 
         // 聲音檔案
         const buttonSound = new Audio('assets/button001.mp3');
         const rollSoundFiles = ['assets/dice001.wav', 'assets/dice002.wav', 'assets/dice003.wav', 'assets/dice004.wav', 'assets/dice005.wav'];
         const rollSounds = rollSoundFiles.map(file => new Audio(file));
-        // SVG 圖示
-        const soundOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
-        const soundOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
         
+        // SVG 圖示
+        const soundOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline-block mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
+        const soundOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline-block mr-2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>`;
         const dieSVGs = {
-            4: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 85H5L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
-            6: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="90" rx="10" stroke="currentColor" stroke-width="5"/></svg>`,
-            8: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 50L50 95L5 50L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+             4: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 85H5L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
+             6: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="90" height="90" rx="10" stroke="currentColor" stroke-width="5"/></svg>`,
+             8: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 50L50 95L5 50L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
             10: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L95 40V60L50 95L5 60V40L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
             12: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L85.36 25L95 60L50 95L5 60L14.64 25L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
             20: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 5L90 35V65L50 95L10 65V35L50 5Z" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></svg>`,
         };
 
-        // 語言資料
+        // 資料
+        const themes = {
+            'dark': { name: { 'zh-TW': '預設主題', 'zh-CN': '默认主题', 'en': 'Default', 'ja': 'デフォルト', 'ko': '기본' } },
+            'darkred': { name: { 'zh-TW': '暗紅主題', 'zh-CN': '暗红主题', 'en': 'Dark Red', 'ja': 'ダークレッド', 'ko': '다크 레드' } },
+            'gold': { name: { 'zh-TW': '金色主題', 'zh-CN': '金色主题', 'en': 'Gold', 'ja': 'ゴールド', 'ko': '골드' } },
+            'mocha': { name: { 'zh-TW': '摩卡主題', 'zh-CN': '摩卡主题', 'en': 'Mocha', 'ja': 'モカ', 'ko': '모카' } },
+            'ptt': { name: { 'zh-TW': '鄉民主題', 'zh-CN': 'PTT主题', 'en': 'PTT', 'ja': 'PTT', 'ko': 'PTT' } },
+            'Cthulhu': { name: { 'zh-TW': '深淵主題', 'zh-CN': '深渊主题', 'en': 'Cthulhu', 'ja': 'クトゥルフ', 'ko': '크툴루' } }
+        };
         const languages = {
-            'zh-TW': { name: '繁體中文', data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"骨灰級骰子工具","singleMode":"單人模式","multiMode":"多人模式","docs":"說明文件","madeBy":"tangledkai_2.0 製作","selectDieType":"選擇骰子類型","currentDieType":"當前類型:","quantity":"數量","roll":"骰出","totalSum":"骰子數字總合"},"singlePlayer":{"longPressHint":"長按此處更換骰子","clickToStartHint":"點擊「骰出」開始","historyTitle":"擲骰紀錄","clear":"清除","usernamePlaceholder":"輸入使用者名稱...","exportLog":"導出擲骰紀錄 (.txt)"},"multiPlayer":{"longPressHint":"長按換骰","defaultGMName":"GM","defaultPlayerName":"玩家","historyTitle":"擲骰紀錄","clear":"清除","exportLog":"導出紀錄","importLog":"導入紀錄"},"docs":{"title":"TRPG-骨灰級骰子工具","welcome":"歡迎使用這款為桌遊與 TRPG 玩家打造的網頁骰子工具！操作直觀，無論您是城主、遊戲主持人 (GM) 還是玩家，都能透過骰子工具獲得擲骰體驗。","featuresTitle":"完整功能說明","menuTitle":"選單介面（左側控制欄）","menuSwitch":"模式切換：","menuSwitchDesc":"在「單人模式」、「多人模式」與「說明文件」之間切換應用程式的主要功能。","menuAudio":"音效開關：","menuAudioDesc":"點擊喇叭圖示，可以在「開啟音效」與「靜音」之間切換音效。","singlePlayerTitle":"單人模式","singlePlayerCore":"核心功能：","singlePlayerCoreDesc":"提供一個大型的個人擲骰面板，包含骰子表演區、總和顯示與數量控制。","singlePlayerChangeDie":"更換骰子類型：","singlePlayerChangeDieDesc":"在「骰子表演區」長按（按住約半秒），即可彈出選單來更換骰子類型（D4, D6, D8, D10, D12, D20）。","singlePlayerHistory":"歷史紀錄：","singlePlayerHistoryDesc":"畫面右側會顯示詳細的擲骰歷史，並可輸入玩家名稱。","singlePlayerExport":"導出紀錄：","singlePlayerExportDesc":"可將右側的擲骰歷史紀錄打包成一個 .txt 文字檔下載。","multiPlayerTitle":"多人模式","multiPlayerLayout":"5+1 面板佈局：","multiPlayerLayoutDesc":"包含 5 個玩家面板（含 1 個 GM）和 1 個共用的歷史紀錄面板。","multiPlayerControls":"獨立控制：","multiPlayerControlsDesc":"每個玩家面板都有獨立的名稱、骰子類型、數量控制與擲骰按鈕。","multiPlayerSaveLoad":"存檔與讀檔：","multiPlayerExport":"導出紀錄：","multiPlayerExportDesc":"點擊此按鈕，會將當前所有玩家的面板設定（名稱、骰子類型、數量等）與完整的歷史紀錄，打包成一個 .txt 存檔。","multiPlayerImport":"導入紀錄：","multiPlayerImportDesc":"點擊此按鈕並選擇之前導出的存檔，即可完整還原整個遊戲場面，包含所有玩家設定與歷史紀錄。","imagesTitle":"說明圖片"},"system":{"audioFail":"音效播放失敗","rolled":"擲出","exportEmpty":"目前沒有任何擲骰紀錄可供導出。","importForMultiOnly":"導入功能僅限多人模式使用。","importInvalidFormat":"導入失敗：檔案格式不正確。","importInvalidJSON":"導入失敗：檔案不是有效的JSON格式。","importErrorConsole":"導入錯誤:"}} },
-            'zh-CN': { name: '简体中文', data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"骨灰级骰子工具","singleMode":"单人模式","multiMode":"多人模式","docs":"说明文件","madeBy":"tangledkai_2.0 制作","selectDieType":"选择骰子类型","currentDieType":"当前类型:","quantity":"数量","roll":"掷骰","totalSum":"骰子数字总和"},"singlePlayer":{"longPressHint":"长按此处更换骰子","clickToStartHint":"点击“掷骰”开始","historyTitle":"掷骰记录","clear":"清除","usernamePlaceholder":"输入使用者名称...","exportLog":"导出掷骰记录 (.txt)"},"multiPlayer":{"longPressHint":"长按换骰","defaultGMName":"GM","defaultPlayerName":"玩家","historyTitle":"掷骰记录","clear":"清除","exportLog":"导出记录","importLog":"导入记录"},"docs":{"title":"TRPG-骨灰级骰子工具","welcome":"欢迎使用这款为桌游与 TRPG 玩家打造的网页骰子工具！操作直观，无论您是城主、游戏主持人 (GM) 还是玩家，都能透过骰子工具获得掷骰体验。","featuresTitle":"完整功能说明","menuTitle":"菜单接口（左侧控制栏）","menuSwitch":"模式切换：","menuSwitchDesc":"在“单人模式”、“多人模式”与“说明文件”之间切换应用程序的主要功能。","menuAudio":"音效开关：","menuAudioDesc":"点击喇叭图标，可以在“开启音效”与“静音”之间切换音效。","singlePlayerTitle":"单人模式","singlePlayerCore":"核心功能：","singlePlayerCoreDesc":"提供一个大型的个人掷骰面板，包含骰子表演区、总和显示与数量控制。","singlePlayerChangeDie":"更换骰子类型：","singlePlayerChangeDieDesc":"在“骰子表演区”长按（按住約半秒），即可弹出菜单来更换骰子类型（D4, D6, D8, D10, D12, D20）。","singlePlayerHistory":"历史记录：","singlePlayerHistoryDesc":"画面右侧会显示详细的掷骰历史，并可输入玩家名称。","singlePlayerExport":"导出记录：","singlePlayerExportDesc":"可将右側的掷骰历史记录打包成一个 .txt 文字文件下载。","multiPlayerTitle":"多人模式","multiPlayerLayout":"5+1 面板布局：","multiPlayerLayoutDesc":"包含 5 个玩家面板（含 1 个 GM）和 1 个共享的历史记录面板。","multiPlayerControls":"独立控制：","multiPlayerControlsDesc":"每个玩家面板都有独立的名称、骰子类型、数量控制与掷骰按钮。","multiPlayerSaveLoad":"存档与读档：","multiPlayerExport":"导出记录：","multiPlayerExportDesc":"点击此按钮，会将当前所有玩家的面板设定（名称、骰子类型、数量等）与完整的历史记录，打包成一个 .txt 存档。","multiPlayerImport":"导入记录：","multiPlayerImportDesc":"点击此按钮并选择之前导出的存档，即可完整还原整个游戏场面，包含所有玩家设定与历史记录。","imagesTitle":"说明图片"},"system":{"audioFail":"音效播放失败","rolled":"掷出","exportEmpty":"目前没有任何掷骰记录可供导出。","importForMultiOnly":"导入功能仅限多人模式使用。","importInvalidFormat":"导入失败：文件格式不正确。","importInvalidJSON":"导入失败：文件不是有效的JSON格式。","importErrorConsole":"导入错误:"}} },
-            'en':    { name: 'English',  data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"Hardcore Dice Roller","singleMode":"Single Player","multiMode":"Multiplayer","docs":"Documentation","madeBy":"tangledkai_2.0 製作","selectDieType":"Select Die Type","currentDieType":"Current Type:","quantity":"Quantity","roll":"Roll","totalSum":"Total Sum of Dice"},"singlePlayer":{"longPressHint":"Long press here to change die","clickToStartHint":"Click 'Roll' to start","historyTitle":"Roll History","clear":"Clear","usernamePlaceholder":"Enter username...","exportLog":"Export Roll History (.txt)"},"multiPlayer":{"longPressHint":"Long press to change","defaultGMName":"GM","defaultPlayerName":"Player","historyTitle":"Roll History","clear":"Clear","exportLog":"Export Log","importLog":"Import Log"},"docs":{"title":"TRPG - Hardcore Dice Roller","welcome":"Welcome to this web-based dice tool designed for tabletop and TRPG players! With intuitive controls, whether you are a Game Master (GM) or a player, you can get a great dice rolling experience.","featuresTitle":"Full Feature Guide","menuTitle":"Menu Interface (Left Sidebar)","menuSwitch":"Mode Switch:","menuSwitchDesc":"Switch the main function of the application between 'Single Player', 'Multiplayer', and 'Documentation'.","menuAudio":"Audio Toggle:","menuAudioDesc":"Click the speaker icon to toggle between 'Sound On' and 'Mute'.","singlePlayerTitle":"Single Player Mode","singlePlayerCore":"Core Function:","singlePlayerCoreDesc":"Provides a large, personal dice rolling panel, including a dice display area, sum total, and quantity controls.","singlePlayerChangeDie":"Change Die Type:","singlePlayerChangeDieDesc":"Long press (hold for about half a second) in the 'dice display area' to bring up a menu to change the die type (D4, D6, D8, D10, D12, D20).","singlePlayerHistory":"History Log:","singlePlayerHistoryDesc":"The right side of the screen displays a detailed roll history, where you can also enter a player name.","singlePlayerExport":"Export Log:","singlePlayerExportDesc":"Allows you to download the roll history on the right as a .txt text file.","multiPlayerTitle":"Multiplayer Mode","multiPlayerLayout":"5+1 Panel Layout:","multiPlayerLayoutDesc":"Includes 5 player panels (including 1 GM) and 1 shared history log panel.","multiPlayerControls":"Independent Controls:","multiPlayerControlsDesc":"Each player panel has its own name, die type, quantity control, and roll button.","multiPlayerSaveLoad":"Save & Load:","multiPlayerExport":"Export Log:","multiPlayerExportDesc":"Click this button to package the current settings of all player panels (name, die type, quantity, etc.) and the complete history log into a .txt save file.","multiPlayerImport":"Import Log:","multiPlayerImportDesc":"Click this button and select a previously exported save file to completely restore the entire game session, including all player settings and history.","imagesTitle":"Instructional Images"},"system":{"audioFail":"Audio playback failed","rolled":"rolled","exportEmpty":"There is currently no roll history to export.","importForMultiOnly":"Import function is only available in multiplayer mode.","importInvalidFormat":"Import failed: Invalid file format.","importInvalidJSON":"The file is not a valid JSON format.","importErrorConsole":"Import Error:"}} },
-            'ja':    { name: '日本語',   data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"ハードコア・ダイスローラー","singleMode":"シングルプレイヤー","multiMode":"マルチプレイヤー","docs":"説明書","madeBy":"作成者 tangledkai_2.0","selectDieType":"ダイスの種類を選択","currentDieType":"現在の種類:","quantity":"数量","roll":"振る","totalSum":"ダイスの合計値"},"singlePlayer":{"longPressHint":"長押しでダイスを変更","clickToStartHint":"「振る」をクリックして開始","historyTitle":"履歴","clear":"クリア","usernamePlaceholder":"ユーザー名を入力...","exportLog":"履歴をエクスポート (.txt)"},"multiPlayer":{"longPressHint":"長押しで変更","defaultGMName":"GM","defaultPlayerName":"プレイヤー","historyTitle":"履歴","clear":"クリア","exportLog":"ログをエクスポート","importLog":"ログをインポート"},"docs":{"title":"TRPG-ハードコア・ダイスローラー","welcome":"テーブルトップゲームとTRPGプレイヤーのために作られたこのウェブダイスツールへようこそ！直感的な操作で、ゲームマスター（GM）でもプレイヤーでも、素晴らしいダイス体験ができます。","featuresTitle":"全機能説明","menuTitle":"メニューインターフェース（左側サイドバー）","menuSwitch":"モード切替：","menuSwitchDesc":"「シングルプレイヤー」、「マルチプレイヤー」、「説明書」の間でアプリケーションの主要機能を切り替えます。","menuAudio":"音声スイッチ：","menuAudioDesc":"スピーカーアイコンをクリックして、音声のオン・オフを切り替えます。","singlePlayerTitle":"シングルプレイヤーモード","singlePlayerCore":"主要機能：","singlePlayerCoreDesc":"ダイス表示エリア、合計値表示、数量コントロールを含む大型の個人用ダイスパネルを提供します。","singlePlayerChangeDie":"ダイスの種類変更：","singlePlayerChangeDieDesc":"「ダイス表示エリア」を長押し（約0.5秒）すると、ダイスの種類（D4, D6, D8, D10, D12, D20）を変更するメニューが表示されます。","singlePlayerHistory":"履歴ログ：","singlePlayerHistoryDesc":"画面右側に詳細なダイスロール履歴が表示され、プレイヤー名も入力できます。","singlePlayerExport":"ログのエクスポート：","singlePlayerExportDesc":"右側のダイスロール履歴を.txtテキストファイルとしてダウンロードできます。","multiPlayerTitle":"マルチプレイヤーモード","multiPlayerLayout":"5+1 パネルレイアウト：","multiPlayerLayoutDesc":"5つのプレイヤーパネル（GM1人を含む）と1つの共有履歴パネルが含まれます。","multiPlayerControls":"独立したコントロール：","multiPlayerControlsDesc":"各プレイヤーパネルには、独立した名前、ダイスの種類、数量コントロール、ロールボタンがあります。","multiPlayerSaveLoad":"セーブ＆ロード：","multiPlayerExport":"ログのエクスポート：","multiPlayerExportDesc":"このボタンをクリックすると、現在の全プレイヤーのパネル設定（名前、ダイスの種類、数量など）と完全な履歴が.txtセーブファイルとしてパッケージ化されます。","multiPlayerImport":"ログのインポート：","multiPlayerImportDesc":"このボタンをクリックして以前にエクスポートしたセーブファイルを選択すると、全プレイヤー設定と履歴を含むゲームセッション全体が完全に復元されます。","imagesTitle":"説明画像"},"system":{"audioFail":"音声再生に失敗しました","rolled":"が振った","exportEmpty":"現在エクスポートできる履歴がありません。","importForMultiOnly":"インポート機能はマルチプレイヤーモードでのみ利用可能です。","importInvalidFormat":"インポート失敗：ファイル形式が正しくありません。","importInvalidJSON":"インポート失敗：ファイルが有効なJSON形式ではありません。","importErrorConsole":"インポートエラー:"}} },
-            'ko':    { name: '한국어',    data: {"common":{"pageTitle":"TRPG-Diceroller-V1.3.0","toolTitle":"하드코어 주사위 툴","singleMode":"싱글 플레이어","multiMode":"멀티플레이어","docs":"설명서","madeBy":"제작: tangledkai_2.0","selectDieType":"주사위 종류 선택","currentDieType":"현재 종류:","quantity":"수량","roll":"굴리기","totalSum":"주사위 총합"},"singlePlayer":{"longPressHint":"주사위를 변경하려면 길게 누르세요","clickToStartHint":"'굴리기'를 클릭하여 시작","historyTitle":"기록","clear":"지우기","usernamePlaceholder":"사용자 이름 입력...","exportLog":"기록 내보내기 (.txt)"},"multiPlayer":{"longPressHint":"변경하려면 길게 누르세요","defaultGMName":"GM","defaultPlayerName":"플레이어","historyTitle":"기록","clear":"지우기","exportLog":"로그 내보내기","importLog":"로그 가져오기"},"docs":{"title":"TRPG-하드코어 주사위 툴","welcome":"테이블탑 및 TRPG 플레이어를 위해 제작된 이 웹 주사위 툴에 오신 것을 환영합니다! 직관적인 조작으로 게임 마스터(GM)든 플레이어든 훌륭한 주사위 굴리기 경험을 할 수 있습니다.","featuresTitle":"전체 기능 설명","menuTitle":"메뉴 인터페이스 (왼쪽 사이드바)","menuSwitch":"모드 전환:","menuSwitchDesc":"애플리케이션의 주요 기능을 '싱글 플레이어', '멀티플레이어', '설명서' 모드로 전환합니다。","menuAudio":"오디오 토글:","menuAudioDesc":"스피커 아이콘을 클릭하여 오디오를 켜거나 끌 수 있습니다。","singlePlayerTitle":"싱글 플레이어 모드","singlePlayerCore":"핵심 기능:","singlePlayerCoreDesc":"주사위 표시 영역, 합계 표시, 수량 조절 기능을 포함한 대형 개인 주사위 패널을 제공합니다。","singlePlayerChangeDie":"주사위 종류 변경:","singlePlayerChangeDieDesc":"'주사위 표시 영역'을 길게 누르면(약 0.5초) 주사위 종류(D4, D6, D8, D10, D12, D20)를 변경할 수 있는 메뉴가 나타납니다。","singlePlayerHistory":"기록 로그:","singlePlayerHistoryDesc":"화면 오른쪽에 상세한 주사위 굴리기 기록이 표시되며, 플레이어 이름을 입력할 수도 있습니다。","singlePlayerExport":"로그 내보내기:","singlePlayerExportDesc":"오른쪽의 주사위 굴리기 기록을 .txt 텍스트 파일로 다운로드할 수 있습니다。","multiPlayerTitle":"멀티플레이어 모드","multiPlayerLayout":"5+1 패널 레이아웃:","multiPlayerLayoutDesc":"5개의 플레이어 패널(GM 1명 포함)과 1개의 공유 기록 패널이 포함됩니다。","multiPlayerControls":"독립적인 제어:","multiPlayerControlsDesc":"각 플레이어 패널에는 독립적인 이름, 주사위 종류, 수량 조절 및 굴리기 버튼이 있습니다。","multiPlayerSaveLoad":"저장 및 불러오기:","multiPlayerExport":"로그 내보내기:","multiPlayerExportDesc":"이 버튼을 클릭하면 현재 모든 플레이어의 패널 설정(이름, 주사위 종류, 수량 등)과 전체 기록이 .txt 저장 파일로 패키징됩니다。","multiPlayerImport":"로그 가져오기:","multiPlayerImportDesc":"이 버튼을 클릭하고 이전에 내보낸 저장 파일을 선택하면 모든 플레이어 설정과 기록을 포함한 전체 게임 세션을 완전히 복원할 수 있습니다。","imagesTitle":"説明圖片"},"system":{"audioFail":"오디오 재생 실패","rolled":"굴림","exportEmpty":"現在내보낼 기록이 없습니다。","importForMultiOnly":"가져오기 기능은 멀티플레이어 모드에서만 사용할 수 있습니다。","importInvalidFormat":"가져오기 실패: 파일 형식이 잘못되었습니다。","importInvalidJSON":"가져오기 실패: 유효한 JSON 형식이 아닙니다。","importErrorConsole":"가져오기 오류:"}} }
+            'zh-TW': { name: '繁體中文', data: {"common":{"pageTitle":"TRPG-Diceroller-V1.7.0","toolTitle":"骨灰級骰子工具","singleMode":"單人模式","multiMode":"多人模式","docs":"說明文件","madeBy":"tangledkai_2.0 製作","selectDieType":"選擇骰子類型","currentDieType":"當前類型:","quantity":"數量","roll":"骰出","totalSum":"骰子數字總合"},"settings":{"title":"設定","theme":"介面主題","language":"語系","font":"字體","sound":"音效","soundOn":"開啟","soundOff":"靜音","diceSize":"骰子大小","diceSizeSmall":"小","diceSizeMedium":"中","diceSizeLarge":"大","close":"關閉"},"singlePlayer":{"longPressHint":"長按此處更換骰子","clickToStartHint":"點擊「骰出」開始","historyTitle":"擲骰紀錄","clear":"清除","usernamePlaceholder":"輸入使用者名稱...","exportLog":"導出擲骰紀錄 (.txt)"},"multiPlayer":{"longPressHint":"長按換骰","defaultGMName":"GM","defaultPlayerName":"玩家","historyTitle":"擲骰紀錄","clear":"清除","exportLog":"導出紀錄","importLog":"導入紀錄"},"docs":{"title":"TRPG-骨灰級骰子工具","welcome":"歡迎使用這款為桌遊與 TRPG 玩家打造的網頁骰子工具！操作直觀，無論您是城主、遊戲主持人 (GM) 還是玩家，都能透過骰子工具獲得擲骰體驗。","featuresTitle":"完整功能說明","menuTitle":"選單介面（左側控制欄）","menuSwitch":"模式切換：","menuSwitchDesc":"在「單人模式」、「多人模式」與「說明文件」之間切換應用程式的主要功能。","menuSettings":"設定選單：","menuSettingsDesc":"點擊左下角的漢堡選單圖示，可以打開設定彈窗，調整主題、語言（支援多國語言）、字體、音效與骰子大小。","singlePlayerTitle":"單人模式","singlePlayerCore":"核心功能：","singlePlayerCoreDesc":"提供一個大型的個人擲骰面板，包含骰子表演區、總和顯示與數量控制。","singlePlayerChangeDie":"更換骰子類型：","singlePlayerChangeDieDesc":"在「骰子表演區」長按（按住約半秒），即可彈出選單來更換骰子類型（D4, D6, D8, D10, D12, D20）。","singlePlayerHistory":"歷史紀錄：","singlePlayerHistoryDesc":"畫面右側會顯示詳細的擲骰歷史，並可輸入玩家名稱。","singlePlayerExport":"導出紀錄：","singlePlayerExportDesc":"可將右側的擲骰歷史紀錄打包成一個 .txt 文字檔下載。","multiPlayerTitle":"多人模式","multiPlayerLayout":"5+1 面板佈局：","multiPlayerLayoutDesc":"包含 5 個玩家面板（含 1 個 GM）和 1 個共用的歷史紀錄面板。","multiPlayerControls":"獨立控制：","multiPlayerControlsDesc":"每個玩家面板都有獨立的名稱、骰子類型、數量控制與擲骰按鈕。","multiPlayerSaveLoad":"存檔與讀檔：","multiPlayerExport":"導出紀錄：","multiPlayerExportDesc":"點擊此按鈕，會將當前所有玩家的面板設定（名稱、骰子類型、數量等）與完整的歷史紀錄，打包成一個 .txt 存檔。","multiPlayerImport":"導入紀錄：","multiPlayerImportDesc":"點擊此按鈕並選擇之前導出的存檔，即可完整還原整個遊戲場面，包含所有玩家設定與歷史紀錄。","imagesTitle":"說明圖片"},"system":{"audioFail":"音效播放失敗","rolled":"擲出","exportEmpty":"目前沒有任何擲骰紀錄可供導出。","importForMultiOnly":"導入功能僅限多人模式使用。","importInvalidFormat":"導入失敗：檔案格式不正確。","importInvalidJSON":"導入失敗：檔案不是有效的JSON格式。","importErrorConsole":"導入錯誤:"}} },
+            'zh-CN': { name: '简体中文', data: {"common":{"pageTitle":"TRPG-Diceroller-V1.7.0","toolTitle":"骨灰级骰子工具","singleMode":"单人模式","multiMode":"多人模式","docs":"说明文件","madeBy":"tangledkai_2.0 制作","selectDieType":"选择骰子类型","currentDieType":"当前类型:","quantity":"数量","roll":"掷骰","totalSum":"骰子数字总和"},"settings":{"title":"设定","theme":"介面主题","language":"语系","font":"字体","sound":"音效","soundOn":"开启","soundOff":"静音","diceSize":"骰子大小","diceSizeSmall":"小","diceSizeMedium":"中","diceSizeLarge":"大","close":"关闭"},"singlePlayer":{"longPressHint":"长按此处更换骰子","clickToStartHint":"点击“掷骰”开始","historyTitle":"掷骰记录","clear":"清除","usernamePlaceholder":"输入使用者名称...","exportLog":"导出掷骰记录 (.txt)"},"multiPlayer":{"longPressHint":"长按换骰","defaultGMName":"GM","defaultPlayerName":"玩家","historyTitle":"掷骰记录","clear":"清除","exportLog":"导出记录","importLog":"导入记录"},"docs":{"title":"TRPG-骨灰级骰子工具","welcome":"欢迎使用这款为桌游与 TRPG 玩家打造的网页骰子工具！操作直观，无论您是城主、游戏主持人 (GM) 还是玩家，都能透过骰子工具获得掷骰体验。","featuresTitle":"完整功能说明","menuTitle":"菜单接口（左侧控制栏）","menuSwitch":"模式切换：","menuSwitchDesc":"在“单人模式”、“多人模式”与“说明文件”之间切换应用程序的主要功能。","menuSettings":"设定菜单：","menuSettingsDesc":"点击左下角的汉堡菜单图标，可以打开设定弹窗，调整主题、语言（支持多国语言）、字体、音效与骰子大小。","singlePlayerTitle":"单人模式","singlePlayerCore":"核心功能：","singlePlayerCoreDesc":"提供一个大型的个人掷骰面板，包含骰子表演区、总和显示与数量控制。","singlePlayerChangeDie":"更换骰子类型：","singlePlayerChangeDieDesc":"在“骰子表演区”长按（按住約半秒），即可弹出菜单来更换骰子类型（D4, D6, D8, D10, D12, D20）。","singlePlayerHistory":"历史记录：","singlePlayerHistoryDesc":"画面右侧会显示详细的掷骰历史，并可输入玩家名称。","singlePlayerExport":"导出记录：","singlePlayerExportDesc":"可将右側的掷骰历史记录打包成一个 .txt 文字文件下载。","multiPlayerTitle":"多人模式","multiPlayerLayout":"5+1 面板布局：","multiPlayerLayoutDesc":"包含 5 个玩家面板（含 1 个 GM）和 1 个共享的历史记录面板。","multiPlayerControls":"独立控制：","multiPlayerControlsDesc":"每个玩家面板都有独立的名称、骰子类型、数量控制与掷骰按钮。","multiPlayerSaveLoad":"存档与读档：","multiPlayerExport":"导出记录：","multiPlayerExportDesc":"点击此按钮，会将当前所有玩家的面板设定（名称、骰子类型、数量等）与完整的历史记录，打包成一个 .txt 存档。","multiPlayerImport":"导入记录：","multiPlayerImportDesc":"点击此按钮并选择之前导出的存档，即可完整还原整个游戏场面，包含所有玩家设定与历史记录。","imagesTitle":"说明图片"},"system":{"audioFail":"音效播放失败","rolled":"掷出","exportEmpty":"目前没有任何掷骰记录可供导出。","importForMultiOnly":"导入功能仅限多人模式使用。","importInvalidFormat":"导入失败：文件格式不正确。","importInvalidJSON":"导入失败：文件不是有效的JSON格式。","importErrorConsole":"导入错误:"}} },
+            'en':    { name: 'English',  data: {"common":{"pageTitle":"TRPG-Diceroller-V1.7.0","toolTitle":"Hardcore Dice Roller","singleMode":"Single Player","multiMode":"Multiplayer","docs":"Documentation","madeBy":"Made by tangledkai_2.0","selectDieType":"Select Die Type","currentDieType":"Current Type:","quantity":"Quantity","roll":"Roll","totalSum":"Total Sum of Dice"},"settings":{"title":"Settings","theme":"Theme","language":"Language","font":"Font","sound":"Sound","soundOn":"On","soundOff":"Off","diceSize":"Dice Size","diceSizeSmall":"S","diceSizeMedium":"M","diceSizeLarge":"L","close":"Close"},"singlePlayer":{"longPressHint":"Long press here to change die","clickToStartHint":"Click 'Roll' to start","historyTitle":"Roll History","clear":"Clear","usernamePlaceholder":"Enter username...","exportLog":"Export Roll History (.txt)"},"multiPlayer":{"longPressHint":"Long press to change","defaultGMName":"GM","defaultPlayerName":"Player","historyTitle":"Roll History","clear":"Clear","exportLog":"Export Log","importLog":"Import Log"},"docs":{"title":"TRPG - Hardcore Dice Roller","welcome":"Welcome to this web-based dice tool designed for tabletop and TRPG players! With intuitive controls, whether you are a Game Master (GM) or a player, you can get a great dice rolling experience.","featuresTitle":"Full Feature Guide","menuTitle":"Menu Interface (Left Sidebar)","menuSwitch":"Mode Switch:","menuSwitchDesc":"Switch the main function of the application between 'Single Player', 'Multiplayer', and 'Documentation'.","menuSettings":"Settings Menu:","menuSettingsDesc":"Click the hamburger menu icon in the lower left corner to open the settings pop-up, where you can adjust the theme, language (multi-language support), font, sound, and dice size.","singlePlayerTitle":"Single Player Mode","singlePlayerCore":"Core Function:","singlePlayerCoreDesc":"Provides a large, personal dice rolling panel, including a dice display area, sum total, and quantity controls.","singlePlayerChangeDie":"Change Die Type:","singlePlayerChangeDieDesc":"Long press (hold for about half a second) in the 'dice display area' to bring up a menu to change the die type (D4, D6, D8, D10, D12, D20).","singlePlayerHistory":"History Log:","singlePlayerHistoryDesc":"The right side of the screen displays a detailed roll history, where you can also enter a player name.","singlePlayerExport":"Export Log:","singlePlayerExportDesc":"Allows you to download the roll history on the right as a .txt text file.","multiPlayerTitle":"Multiplayer Mode","multiPlayerLayout":"5+1 Panel Layout:","multiPlayerLayoutDesc":"Includes 5 player panels (including 1 GM) and 1 shared history log panel.","multiPlayerControls":"Independent Controls:","multiPlayerControlsDesc":"Each player panel has its own name, die type, quantity control, and roll button.","multiPlayerSaveLoad":"Save & Load:","multiPlayerExport":"Export Log:","multiPlayerExportDesc":"Click this button to package the current settings of all player panels (name, die type, quantity, etc.) and the complete history log into a .txt save file.","multiPlayerImport":"Import Log:","multiPlayerImportDesc":"Click this button and select a previously exported save file to completely restore the entire game session, including all player settings and history.","imagesTitle":"Instructional Images"},"system":{"audioFail":"Audio playback failed","rolled":"rolled","exportEmpty":"There is currently no roll history to export.","importForMultiOnly":"Import function is only available in multiplayer mode.","importInvalidFormat":"Import failed: Invalid file format.","importInvalidJSON":"The file is not a valid JSON format.","importErrorConsole":"Import Error:"}} },
+            'ja':    { name: '日本語',   data: {"common":{"pageTitle":"TRPG-Diceroller-V1.7.0","toolTitle":"ハードコア・ダイスローラー","singleMode":"シングルプレイヤー","multiMode":"マルチプレイヤー","docs":"説明書","madeBy":"作成者 tangledkai_2.0","selectDieType":"ダイスの種類を選択","currentDieType":"現在の種類:","quantity":"数量","roll":"振る","totalSum":"ダイスの合計値"},"settings":{"title":"設定","theme":"テーマ","language":"言語","font":"フォント","sound":"サウンド","soundOn":"オン","soundOff":"オフ","diceSize":"ダイスサイズ","diceSizeSmall":"小","diceSizeMedium":"中","diceSizeLarge":"大","close":"閉じる"},"singlePlayer":{"longPressHint":"長押しでダイスを変更","clickToStartHint":"「振る」をクリックして開始","historyTitle":"履歴","clear":"クリア","usernamePlaceholder":"ユーザー名を入力...","exportLog":"履歴をエクスポート (.txt)"},"multiPlayer":{"longPressHint":"長押しで変更","defaultGMName":"GM","defaultPlayerName":"プレイヤー","historyTitle":"履歴","clear":"クリア","exportLog":"ログをエクスポート","importLog":"ログをインポート"},"docs":{"title":"TRPG-ハードコア・ダイスローラー","welcome":"テーブルトップゲームとTRPGプレイヤーのために作られたこのウェブダイスツールへようこそ！直感的な操作で、ゲームマスター（GM）でもプレイヤーでも、素晴らしいダイス体験ができます。","featuresTitle":"全機能説明","menuTitle":"メニューインターフェース（左側サイドバー）","menuSwitch":"モード切替：","menuSwitchDesc":"「シングルプレイヤー」、「マルチプレイヤー」、「説明書」の間でアプリケーションの主要機能を切り替えます。","menuSettings":"設定メニュー：","menuSettingsDesc":"左下のハンバーガーメニューアイコンをクリックすると設定ウィンドウが開き、テーマ、言語（多言語対応）、フォント、サウンド、ダイスのサイズを調整できます。","singlePlayerTitle":"シングルプレイヤーモード","singlePlayerCore":"主要機能：","singlePlayerCoreDesc":"ダイス表示エリア、合計値表示、数量コントロールを含む大型の個人用ダイスパネルを提供します。","singlePlayerChangeDie":"ダイスの種類変更：","singlePlayerChangeDieDesc":"「ダイス表示エリア」を長押し（約0.5秒）すると、ダイスの種類（D4, D6, D8, D10, D12, D20）を変更するメニューが表示されます。","singlePlayerHistory":"履歴ログ：","singlePlayerHistoryDesc":"画面右側に詳細なダイスロール履歴が表示され、プレイヤー名も入力できます。","singlePlayerExport":"ログのエクスポート：","singlePlayerExportDesc":"右側のダイスロール履歴を.txtテキストファイルとしてダウンロードできます。","multiPlayerTitle":"マルチプレイヤーモード","multiPlayerLayout":"5+1 パネルレイアウト：","multiPlayerLayoutDesc":"5つのプレイヤーパネル（GM1人を含む）と1つの共有履歴パネルが含まれます。","multiPlayerControls":"独立したコントロール：","multiPlayerControlsDesc":"各プレイヤーパネルには、独立した名前、ダイスの種類、数量コントロール、ロールボタンがあります。","multiPlayerSaveLoad":"セーブ＆ロード：","multiPlayerExport":"ログのエクスポート：","multiPlayerExportDesc":"このボタンをクリックすると、現在の全プレイヤーのパネル設定（名前、ダイスの種類、数量など）と完全な履歴が.txtセーブファイルとしてパッケージ化されます。","multiPlayerImport":"ログのインポート：","multiPlayerImportDesc":"このボタンをクリックして以前にエクスポートしたセーブファイルを選択すると、全プレイヤー設定と履歴を含むゲームセッション全体が完全に復元されます。","imagesTitle":"説明画像"},"system":{"audioFail":"音声再生に失敗しました","rolled":"が振った","exportEmpty":"現在エクスポートできる履歴がありません。","importForMultiOnly":"インポート機能はマルチプレイヤーモードでのみ利用可能です。","importInvalidFormat":"インポート失敗：ファイル形式が正しくありません。","importInvalidJSON":"インポート失敗：ファイルが有効なJSON形式ではありません。","importErrorConsole":"インポートエラー:"}} },
+            'ko':    { name: '한국어',    data: {"common":{"pageTitle":"TRPG-Diceroller-V1.7.0","toolTitle":"하드코어 주사위 툴","singleMode":"싱글 플레이어","multiMode":"멀티플레이어","docs":"설명서","madeBy":"제작: tangledkai_2.0","selectDieType":"주사위 종류 선택","currentDieType":"현재 종류:","quantity":"수량","roll":"굴리기","totalSum":"주사위 총합"},"settings":{"title":"설정","theme":"테마","language":"언어","font":"글꼴","sound":"사운드","soundOn":"켜기","soundOff":"끄기","diceSize":"주사위 크기","diceSizeSmall":"소","diceSizeMedium":"중","diceSizeLarge":"대","close":"닫기"},"singlePlayer":{"longPressHint":"주사위를 변경하려면 길게 누르세요","clickToStartHint":"'굴리기'를 클릭하여 시작","historyTitle":"기록","clear":"지우기","usernamePlaceholder":"사용자 이름 입력...","exportLog":"기록 내보내기 (.txt)"},"multiPlayer":{"longPressHint":"변경하려면 길게 누르세요","defaultGMName":"GM","defaultPlayerName":"플레이어","historyTitle":"기록","clear":"지우기","exportLog":"로그 내보내기","importLog":"로그 가져오기"},"docs":{"title":"TRPG-하드코어 주사위 툴","welcome":"테이블탑 및 TRPG 플레이어를 위해 제작된 이 웹 주사위 툴에 오신 것을 환영합니다! 직관적인 조작으로 게임 마스터(GM)든 플레이어든 훌륭한 주사위 굴리기 경험을 할 수 있습니다.","featuresTitle":"전체 기능 설명","menuTitle":"메뉴 인터페이스 (왼쪽 사이드바)","menuSwitch":"모드 전환:","menuSwitchDesc":"애플리케이션의 주요 기능을 '싱글 플레이어', '멀티플레이어', '설명서' 모드로 전환합니다。","menuSettings":"설정 메뉴:","menuSettingsDesc":"왼쪽 하단의 햄버거 메뉴 아이콘을 클릭하여 설정 팝업을 열고 테마, 언어(다국어 지원), 글꼴, 사운드 및 주사위 크기를 조정할 수 있습니다.","singlePlayerTitle":"싱글 플레이어 모드","singlePlayerCore":"핵심 기능：","singlePlayerCoreDesc":"주사위 표시 영역, 합계 표시, 수량 조절 기능을 포함한 대형 개인 주사위 패널을 제공합니다。","singlePlayerChangeDie":"주사위 종류 변경:","singlePlayerChangeDieDesc":"'주사위 표시 영역'을 길게 누르면(약 0.5초) 주사위 종류(D4, D6, D8, D10, D12, D20)를 변경할 수 있는 메뉴가 나타납니다。","singlePlayerHistory":"기록 로그:","singlePlayerHistoryDesc":"화면 오른쪽에 상세한 주사위 굴리기 기록이 표시되며, 플레이어 이름을 입력할 수도 있습니다。","singlePlayerExport":"로그 내보내기:","singlePlayerExportDesc":"오른쪽의 주사위 굴리기 기록을 .txt 텍스트 파일로 다운로드할 수 있습니다。","multiPlayerTitle":"멀티플레이어 모드","multiPlayerLayout":"5+1 패널 레이아웃:","multiPlayerLayoutDesc":"5개의 플레이어 패널(GM 1명 포함)과 1개의 공유 기록 패널이 포함됩니다。","multiPlayerControls":"독립적인 제어:","multiPlayerControlsDesc":"각 플레이어 패널에는 독립적인 이름, 주사위 종류, 수량 조절 및 굴리기 버튼이 있습니다。","multiPlayerSaveLoad":"저장 및 불러오기:","multiPlayerExport":"로그 내보내기:","multiPlayerExportDesc":"이 버튼을 클릭하면 현재 모든 플레이어의 패널 설정(이름, 주사위 종류, 수량 등)과 전체 기록이 .txt 저장 파일로 패키징됩니다。","multiPlayerImport":"로그 가져오기:","multiPlayerImportDesc":"이 버튼을 클릭하고 이전에 내보낸 저장 파일을 선택하면 모든 플레이어 설정과 기록을 포함한 전체 게임 세션을 완전히 복원할 수 있습니다。","imagesTitle":"설명 이미지"},"system":{"audioFail":"오디오 재생 실패","rolled":"굴림","exportEmpty":"내보낼 기록이 없습니다。","importForMultiOnly":"가져오기 기능은 멀티플레이어 모드에서만 사용할 수 있습니다。","importInvalidFormat":"가져오기 실패: 파일 형식이 잘못되었습니다。","importInvalidJSON":"가져오기 실패: 유효한 JSON 형식이 아닙니다。","importErrorConsole":"가져오기 오류:"}} }
         };
-
-        // 從 localStorage 載入目前的語言，如果沒有則預設為繁體中文
-        let currentLang = localStorage.getItem('language') || 'zh-TW';
-        let languageData = languages[currentLang].data; // 初始化 languageData
-        
-        // v9: 字體設定
-        let currentFont = localStorage.getItem('font') || 'NotoSansTC'; // 從 localStorage 載入字體
         const fonts = {
-            'NotoSansTC': { name: 'NotoSansTC', family: "'Noto Sans TC', 'Inter', sans-serif" },
-            'Cubic': { name: 'Cubic-11', family: "'Cubic 11', sans-serif" }
+            'NotoSansTC': { name: { 'zh-TW': '思源黑體', 'zh-CN': '思源黑体', 'en': 'Noto Sans TC', 'ja': 'Noto Sans TC', 'ko': 'Noto Sans TC' }, family: "'Noto Sans TC', 'Inter', sans-serif" },
+            'Cubic': { name: { 'zh-TW': '像素字體', 'zh-CN': '像素字体', 'en': 'Pixel Font', 'ja': 'ピクセルフォント', 'ko': '픽셀 폰트' }, family: "'Cubic 11', sans-serif" }
         };
 
-        // 函式：設定字體
+        // 設定狀態
+        let currentTheme, currentLang, currentFont, diceSize;
+        let languageData;
+
+        // --- 設定與狀態管理函式 ---
+        
+        function setTheme(themeKey) {
+            currentTheme = themeKey;
+            document.documentElement.dataset.theme = themeKey;
+            localStorage.setItem('theme', themeKey);
+            updateSettingsUI();
+        }
+
+        function setLanguage(langKey) {
+            currentLang = langKey;
+            languageData = languages[langKey].data;
+            localStorage.setItem('language', langKey);
+            renderUIForCurrentMode();
+            updateSettingsUI();
+        }
+
         function setFont(fontKey) {
             currentFont = fontKey;
-            localStorage.setItem('font', currentFont); // 儲存字體設定
             const font = fonts[fontKey];
             let fontFaceRule = "";
             if (fontKey === 'Cubic') {
-                fontFaceRule = `@font-face { font-family: 'Cubic 11'; src: url('fonts/Cubic_11_1.013_R.ttf') format('truetype'); }`;
+                fontFaceRule = `@font-face { font-family: 'Cubic 11'; src: url('https://cdn.jsdelivr.net/gh/tangledkai/TRPG-Diceroller@main/fonts/Cubic_11_1.013_R.ttf') format('truetype'); }`;
             } else {
-                // 為 Noto Sans TC 和 Inter 添加本地 font-face 規則
-                fontFaceRule = `@font-face { font-family: 'Noto Sans TC'; src: url('fonts/NotoSansTC-Regular.otf') format('opentype'); } @font-face { font-family: 'Inter'; src: url('assets/fonts/Inter-Regular.ttf') format('truetype'); }`;
-            }            
+                fontFaceRule = `@font-face { font-family: 'Noto Sans TC'; src: url('https://cdn.jsdelivr.net/gh/tangledkai/TRPG-Diceroller@main/fonts/NotoSansTC-Regular.otf') format('opentype'); } @font-face { font-family: 'Inter'; src: url('https://cdn.jsdelivr.net/gh/tangledkai/TRPG-Diceroller@main/assets/fonts/Inter-Regular.ttf') format('truetype'); }`;
+            }
             fontRulesStyleTag.innerHTML = fontFaceRule;
             document.body.style.fontFamily = font.family;
-            updateFontSwitcher();
+            localStorage.setItem('font', fontKey);
+            updateSettingsUI();
         }
 
-        // 函式：更新字體切換器顯示
-        function updateFontSwitcher() {
-            const btn = document.getElementById('font-dropdown-btn');
-            const menu = document.getElementById('font-dropdown-menu');
-            if (btn) btn.textContent = fonts[currentFont].name;
-            
-            if (menu) {
-                menu.innerHTML = '';
-                Object.keys(fonts).forEach(fontCode => {
-                    // 避免在選單中顯示當前已選的字體
-                    if (fontCode !== currentFont) {
-                        const item = document.createElement('button');
-                        item.textContent = fonts[fontCode].name;
-                        item.dataset.font = fontCode;
-                        item.className = 'block w-full text-left px-4 py-2 text-lg hover:bg-gray-700 rounded-lg'; // 新增 rounded-lg 讓邊角更圓滑
-                        menu.appendChild(item);
-                    }
-                });
-            }
+        function setDiceSize(size) {
+            diceSize = size;
+            document.documentElement.style.setProperty('--dice-size', `${size}px`);
+            localStorage.setItem('diceSize', size);
+            updateSettingsUI();
         }
+
+        function toggleMute() {
+            globalState.isMuted = !globalState.isMuted;
+            localStorage.setItem('isMuted', globalState.isMuted);
+            if (!globalState.isMuted) playSound(buttonSound);
+            updateSettingsUI();
+        }
+        
+        // --- UI 更新函式 ---
+
+        function updateSettingsUI() {
+            if (!languageData) return;
+            const settingsText = languageData.settings;
+            // 更新標籤
+            document.getElementById('settings-title').textContent = settingsText.title;
+            document.getElementById('theme-label').textContent = settingsText.theme;
+            document.getElementById('language-label').textContent = settingsText.language;
+            document.getElementById('font-label').textContent = settingsText.font;
+            document.getElementById('sound-label').textContent = settingsText.sound;
+            document.getElementById('dice-size-label').textContent = settingsText.diceSize;
+            closeSettingsBtn.textContent = settingsText.close;
+
+            // 更新主題下拉選單（多語言）
+            themeSelect.innerHTML = '';
+            for (const key in themes) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = (themes[key].name && themes[key].name[currentLang]) || key;
+                themeSelect.appendChild(option);
+            }
+            themeSelect.value = currentTheme;
+
+            // 更新語言下拉選單
+            languageSelect.innerHTML = '';
+            for (const key in languages) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = languages[key].name;
+                languageSelect.appendChild(option);
+            }
+            languageSelect.value = currentLang;
+            
+            // 更新字體下拉選單（多語言）
+            fontSelect.innerHTML = '';
+            for (const key in fonts) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = (fonts[key].name && fonts[key].name[currentLang]) || key;
+                fontSelect.appendChild(option);
+            }
+            fontSelect.value = currentFont;
+
+            // 更新音效按鈕
+            soundToggleBtn.innerHTML = (globalState.isMuted ? soundOffIcon : soundOnIcon) + (globalState.isMuted ? settingsText.soundOff : settingsText.soundOn);
+
+            // 更新骰子大小滑桿
+            diceSizeSlider.value = diceSize;
+            let sizeLabel = '';
+            if (diceSize == 32) sizeLabel = settingsText.diceSizeSmall;
+            else if (diceSize == 48) sizeLabel = settingsText.diceSizeMedium;
+            else if (diceSize == 64) sizeLabel = settingsText.diceSizeLarge;
+            diceSizeValue.textContent = sizeLabel;
+        }
+
+        // --- 核心邏輯 (與之前版本類似，但有調整) ---
         
         // 播放音效函式
         function playSound(audio) { 
@@ -183,65 +483,32 @@
         };
         // 播放隨機擲骰音效函式
         function playRandomRollSound() { playSound(rollSounds[Math.floor(Math.random() * rollSounds.length)]); };
-        // 更新音效開關圖示
-        function updateSoundToggleIcon(){ 
-            soundToggleBtn.innerHTML = globalState.isMuted ? soundOffIcon : soundOnIcon; 
-        };
-
-        // 設定語言函式
-        function setLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('language', currentLang); // 儲存語言設定
-            languageData = languages[lang].data;
-            renderUIForCurrentMode(); // 重新渲染 UI 以更新所有文字
-            updateLanguageSwitcher(); // 更新語言切換器顯示
-        };
-
-        // 更新語言切換器顯示
-        function updateLanguageSwitcher() {
-            const btn = document.getElementById('lang-dropdown-btn');
-            const menu = document.getElementById('lang-dropdown-menu');
-            if (btn) btn.textContent = languages[currentLang].name;
-            
-            if (menu) {
-                menu.innerHTML = '';
-                Object.keys(languages).forEach(langCode => {
-                    if (langCode !== currentLang) {
-                        const item = document.createElement('button');
-                        item.textContent = languages[langCode].name;
-                        item.dataset.lang = langCode;
-                        item.className = 'block w-full text-left px-4 py-2 text-lg hover:bg-gray-700 rounded-lg'; // 新增 rounded-lg
-                        menu.appendChild(item);
-                    }
-                });
-            }
-        };
 
         // 創建玩家面板 HTML
         function createPlayerPanel(playerId) {
             const state = playerStates[playerId];
-            if(!state) return null; // 如果狀態不存在，返回 null
+            if(!state) return null;
             const panel = document.createElement('div');
             panel.id = `panel-${playerId}`;
-            panel.className = `player-panel bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full`;
-            const controlsHTML = `<div class="grid grid-cols-3 gap-2"><div class="bg-gray-700/80 rounded-xl flex items-center justify-center"><span class="font-bold text-xl">${languageData.common.quantity}</span></div><div class="bg-gray-700/80 rounded-xl flex items-center justify-evenly p-1"><button data-action="decrease-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-${playerId}" class="text-2xl font-bold w-10 text-center">${state.quantity}</span><button data-action="increase-qty" data-player="${playerId}" class="w-8 h-8 bg-gray-600 rounded-md text-xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div><button data-action="roll" data-player="${playerId}" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors flex items-center justify-center">${languageData.common.roll}</button></div>`;
-            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-gray-400"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-white w-2/3 focus:outline-none focus:bg-gray-700/50 rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-player="${playerId}" class="flex-grow bg-gray-900/50 rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center text-2xl"><p class="font-bold">${languageData.multiPlayer.longPressHint}</p></div></div><div class="text-center mb-2"><span class="text-gray-400 text-sm tracking-widest">${languageData.common.totalSum}</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-amber-400 transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
+            panel.className = `player-panel bg-panel rounded-2xl p-4 flex flex-col h-full`;
+            const controlsHTML = `<div class="grid grid-cols-3 gap-2"><div class="bg-box rounded-xl flex items-center justify-center"><span class="font-bold text-xl text-sub">${languageData.common.quantity}</span></div><div class="bg-box rounded-xl flex items-center justify-evenly p-1"><button data-action="decrease-qty" data-player="${playerId}" class="w-8 h-8 bg-panel-light rounded-md text-xl font-bold flex items-center justify-center active:bg-box transition-colors">-</button><span id="quantity-display-${playerId}" class="text-2xl font-bold w-10 text-center text-main">${state.quantity}</span><button data-action="increase-qty" data-player="${playerId}" class="w-8 h-8 bg-panel-light rounded-md text-xl font-bold flex items-center justify-center active:bg-box transition-colors">+</button></div><button data-action="roll" data-player="${playerId}" class="bg-btn rounded-xl text-xl font-bold hover:bg-btn-hover active:bg-btn-active transition-colors flex items-center justify-center text-btn">${languageData.common.roll}</button></div>`;
+            panel.innerHTML = `<div class="flex justify-between items-center mb-2 text-muted"><input type="text" data-action="change-name" data-player="${playerId}" value="${state.name}" class="bg-transparent font-bold text-lg text-main w-2/3 focus:outline-none focus:bg-box rounded px-2"><div class="flex items-center"><span>D:</span><div id="current-die-icon-display-${playerId}" class="w-6 h-6 ml-1">${dieSVGs[state.dieType]}</div></div></div><div id="dice-area-${playerId}" data-player="${playerId}" class="flex-grow bg-panel-light rounded-2xl mb-2 p-2 flex justify-center items-center flex-wrap gap-2 content-center cursor-pointer border-2 border-dashed border-box relative"><div class="text-muted text-center text-2xl"><p class="font-bold">${languageData.multiPlayer.longPressHint}</p></div></div><div class="text-center mb-2"><span class="text-muted text-sm tracking-widest">${languageData.common.totalSum}</span><p id="sum-display-${playerId}" class="text-5xl font-black tracking-tighter text-highlight transition-all duration-300">${state.sum}</p></div>${controlsHTML}`;
             return panel;
         };
         
         // 創建歷史紀錄面板 HTML
         function createHistoryPanel() {
             const panel = document.createElement('div');
-            panel.className = "bg-gray-900/80 rounded-2xl p-4 flex flex-col h-full";
+            panel.className = "bg-panel rounded-2xl p-4 flex flex-col h-full";
             panel.innerHTML = `
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-lg font-bold text-gray-300">${languageData.multiPlayer.historyTitle}</h3>
-                    <button data-action="clear-history" class="text-lg text-red-400 hover:text-red-300 active:text-red-500 transition-colors">${languageData.multiPlayer.clear}</button>
+                    <h3 class="text-lg font-bold text-sub">${languageData.multiPlayer.historyTitle}</h3>
+                    <button data-action="clear-history" class="text-lg text-danger hover:text-danger-hover transition-colors">${languageData.multiPlayer.clear}</button>
                 </div>
-                <div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-2 bg-gray-900/50 p-3 rounded-lg border-2 border-gray-700/50 mb-2"></div>
+                <div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-2 bg-panel-light p-3 rounded-lg border-2 border-main mb-2"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button data-action="export-history" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 text-xl transition-colors">${languageData.multiPlayer.exportLog}</button>
-                    <button data-action="import-history" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-500 text-xl transition-colors">${languageData.multiPlayer.importLog}</button>
+                    <button data-action="export-history" class="w-full bg-link text-white font-bold py-3 px-4 rounded-xl hover:bg-link-hover text-xl transition-colors">${languageData.multiPlayer.exportLog}</button>
+                    <button data-action="import-history" class="w-full bg-success text-white font-bold py-3 px-4 rounded-xl hover:bg-success-hover text-xl transition-colors">${languageData.multiPlayer.importLog}</button>
                 </div>
             `;
             return panel;
@@ -249,27 +516,27 @@
         
         // 創建單人模式 UI HTML
         function createSinglePlayerUI() {
-            return `<div class="h-full flex w-full max-w-4xl mx-auto"><div class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative"><div class="flex justify-center items-center mb-2 text-gray-400 pt-8"><span>${languageData.common.currentDieType}</span><div id="current-die-icon-display-player1" class="w-7 h-7 ml-2"></div></div><div id="dice-area-player1" data-player="player1" class="flex-grow bg-gray-900/50 rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-gray-600/80 relative"><div class="text-gray-500 text-center leading-relaxed text-base "><p class="font-bold">${languageData.singlePlayer.longPressHint}</p><p>${languageData.singlePlayer.clickToStartHint}</p></div></div><div class="text-center mb-4"><span class="text-gray-400 text-lg tracking-widest">${languageData.common.totalSum}</span><p id="sum-display-player1" class="text-6xl font-black tracking-tighter text-amber-400 transition-all duration-300">0</p></div><div class="grid grid-cols-5 gap-4"><div class="bg-gray-700 rounded-xl flex items-center justify-between p-2 col-span-3"><span class="font-bold ml-3 text-lg">${languageData.common.quantity}</span><div class="flex items-center gap-2"><button data-action="decrease-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">-</button><span id="quantity-display-player1" class="text-2xl font-bold w-10 text-center">1</span><button data-action="increase-qty" data-player="player1" class="w-10 h-10 bg-gray-600 rounded-lg text-2xl font-bold flex items-center justify-center active:bg-gray-500 transition-colors">+</button></div></div><button data-action="roll" data-player="player1" class="bg-amber-600 rounded-xl text-xl font-bold hover:bg-amber-500 active:bg-amber-700 transition-colors col-span-2 flex items-center justify-center">${languageData.common.roll}</button></div></div><div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-gray-900/60 p-4 border-l-2 border-gray-700/50"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-gray-300">${languageData.singlePlayer.historyTitle}</h3><button data-action="clear-history" class="text-sm text-red-400 hover:text-red-300 active:text-red-500 transition-colors">${languageData.singlePlayer.clear}</button></div><div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div><input type="text" data-action="change-name" data-player="player1" class="w-full bg-gray-800/80 border-2 border-gray-700 rounded-lg py-2 px-3 mt-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="${languageData.singlePlayer.usernamePlaceholder}"><button data-action="export-history" class="mt-4 w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-500 transition-colors">${languageData.singlePlayer.exportLog}</button></div></div>`;
+            return `<div class="h-full flex w-full max-w-4xl mx-auto"><div class="h-full flex flex-col p-4 md:p-6 flex-1 min-w-0 relative"><div class="flex justify-center items-center mb-2 text-muted pt-8"><span>${languageData.common.currentDieType}</span><div id="current-die-icon-display-player1" class="w-7 h-7 ml-2"></div></div><div id="dice-area-player1" data-player="player1" class="flex-grow bg-panel-light rounded-2xl mb-4 p-4 flex justify-center items-center flex-wrap gap-4 content-center cursor-pointer border-2 border-dashed border-box relative"><div class="text-muted text-center leading-relaxed text-base "><p class="font-bold">${languageData.singlePlayer.longPressHint}</p><p>${languageData.singlePlayer.clickToStartHint}</p></div></div><div class="text-center mb-4"><span class="text-muted text-lg tracking-widest">${languageData.common.totalSum}</span><p id="sum-display-player1" class="text-6xl font-black tracking-tighter text-highlight transition-all duration-300">0</p></div><div class="grid grid-cols-5 gap-4"><div class="bg-box rounded-xl flex items-center justify-between p-2 col-span-3"><span class="font-bold ml-3 text-lg text-sub">${languageData.common.quantity}</span><div class="flex items-center gap-2"><button data-action="decrease-qty" data-player="player1" class="w-10 h-10 bg-panel-light rounded-lg text-2xl font-bold flex items-center justify-center active:bg-box transition-colors">-</button><span id="quantity-display-player1" class="text-2xl font-bold w-10 text-center">1</span><button data-action="increase-qty" data-player="player1" class="w-10 h-10 bg-panel-light rounded-lg text-2xl font-bold flex items-center justify-center active:bg-box transition-colors">+</button></div></div><button data-action="roll" data-player="player1" class="bg-btn rounded-xl text-xl font-bold hover:bg-btn-hover active:bg-btn-active text-btn transition-colors col-span-2 flex items-center justify-center">${languageData.common.roll}</button></div></div><div class="hidden md:flex flex-col h-full w-1/3 max-w-xs bg-panel p-4 border-l-2 border-main"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold text-sub">${languageData.singlePlayer.historyTitle}</h3><button data-action="clear-history" class="text-sm text-danger hover:text-danger-hover transition-colors">${languageData.singlePlayer.clear}</button></div><div id="history-log" class="history-log flex-1 overflow-y-auto pr-2 space-y-3"></div><input type="text" data-action="change-name" data-player="player1" class="w-full bg-main border-2 border-box rounded-lg py-2 px-3 mt-4 text-main placeholder-color focus:outline-none focus:border-link-hover transition-colors" placeholder="${languageData.singlePlayer.usernamePlaceholder}"><button data-action="export-history" class="mt-4 w-full bg-link text-white font-bold py-3 px-4 rounded-xl hover:bg-link-hover transition-colors">${languageData.singlePlayer.exportLog}</button></div></div>`;
         };
         
         // 創建說明文件 UI HTML
         function createDocsUI() {
             const doc = languageData.docs;
             return `
-            <div class="h-full w-full flex flex-col text-gray-300 p-4 space-y-6 text-base">
-                <h2 class="text-3xl font-black text-center text-amber-300">${doc.title}</h2>
+            <div class="h-full w-full flex justify-center overflow-y-auto"><div class="max-w-4xl text-sub p-4 space-y-6 text-base">
+                <h2 class="text-3xl font-black text-center text-title">${doc.title}</h2>
                 <p class="text-center text-lg">${doc.welcome}</p>
-                <div class="border-b border-gray-600 my-2"></div>
-                <h3 class="text-2xl font-bold text-amber-400">${doc.featuresTitle}</h3>
+                <div class="border-b border-box my-2"></div>
+                <h3 class="text-2xl font-bold text-highlight">${doc.featuresTitle}</h3>
                 <div>
-                    <h4 class="text-xl font-bold text-white mb-2">${doc.menuTitle}</h4>
+                    <h4 class="text-xl font-bold text-main mb-2">${doc.menuTitle}</h4>
                     <ul class="list-disc list-inside space-y-2 pl-4">
                         <li><strong>${doc.menuSwitch}</strong> ${doc.menuSwitchDesc}</li>
-                        <li><strong>${doc.menuAudio}</strong> ${doc.menuAudioDesc}</li>
+                        <li><strong>${doc.menuSettings}</strong> ${doc.menuSettingsDesc}</li>
                     </ul>
                 </div>
-                <div>
-                    <h4 class="text-xl font-bold text-white mb-2">${doc.singlePlayerTitle}</h4>
+                 <div>
+                    <h4 class="text-xl font-bold text-main mb-2">${doc.singlePlayerTitle}</h4>
                     <ul class="list-disc list-inside space-y-2 pl-4">
                         <li><strong>${doc.singlePlayerCore}</strong> ${doc.singlePlayerCoreDesc}</li>
                         <li><strong>${doc.singlePlayerChangeDie}</strong> ${doc.singlePlayerChangeDieDesc}</li>
@@ -278,7 +545,7 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-xl font-bold text-white mb-2">${doc.multiPlayerTitle}</h4>
+                    <h4 class="text-xl font-bold text-main mb-2">${doc.multiPlayerTitle}</h4>
                     <ul class="list-disc list-inside space-y-2 pl-4">
                         <li><strong>${doc.multiPlayerLayout}</strong> ${doc.multiPlayerLayoutDesc}</li>
                         <li><strong>${doc.multiPlayerControls}</strong> ${doc.multiPlayerControlsDesc}</li>
@@ -290,21 +557,24 @@
                         </li>
                     </ul>
                 </div>
-                <div class="border-b border-gray-600 my-2"></div>
+                <div class="border-b border-box my-2"></div>
                 <div class="w-full flex flex-col items-center space-y-4">
-                    <h2 class="text-2xl font-bold text-amber-300">${doc.imagesTitle}</h2>
-                    <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
-                        <img src="assets/Singleplayermode readme.png" alt="單人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Singleplayer+Mode+Readme.png';">
+                    <h2 class="text-2xl font-bold text-title">${doc.imagesTitle}</h2>
+                    <div class="w-full p-2 bg-panel-light rounded-lg flex justify-center">
+                        <img src="assets/Singleplayermode%20readme.png" alt="單人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Singleplayer+Mode+Readme.png';">
                     </div>
-                    <div class="w-full p-2 bg-gray-900/50 rounded-lg flex justify-center">
-                        <img src="assets/Multiplayermode readme.png" alt="多人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Multiplayer+Mode+Readme.png';">
+                    <div class="w-full p-2 bg-panel-light rounded-lg flex justify-center">
+                        <img src="assets/Functionsettings%20readme.png" alt="設定說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Functionsettings+Readme.png';">
+                    </div>
+                    <div class="w-full p-2 bg-panel-light rounded-lg flex justify-center">
+                        <img src="assets/Multiplayermode%20readme.png" alt="多人模式說明" class="w-4/5 h-auto object-contain rounded-md" onerror="this.onerror=null;this.src='https://placehold.co/800x450/2d3748/e2e8f0?text=Multiplayermode+Readme.png';">
                     </div>
                 </div>
-            </div>
+            </div></div>
             `;
         };
         
-        // 更新 UI 顯示函式 (數量、骰子圖示、總和)
+        // 更新 UI 顯示函式 (數量、骰子圖示、總和)  
         function updateUI(playerId) {
             const state = playerStates[playerId];
             if (!state) return;
@@ -319,12 +589,14 @@
         // 創建骰子元素函式
         function createDieElement(value, type) {
             const dieFace = document.createElement('div');
-            dieFace.className = 'w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center shadow-lg relative animate-roll-in';
+            dieFace.className = 'bg-box rounded-lg flex items-center justify-center shadow-lg relative animate-roll-in';
+            dieFace.style.width = 'var(--dice-size)';
+            dieFace.style.height = 'var(--dice-size)';
             const svgIcon = document.createElement('div');
-            svgIcon.className = 'absolute inset-0 text-gray-400 opacity-30 p-1';
+            svgIcon.className = 'absolute inset-0 text-muted opacity-30 p-1';
             svgIcon.innerHTML = dieSVGs[type];
             const numberText = document.createElement('span');
-            numberText.className = 'text-2xl font-bold z-10';
+            numberText.className = 'text-2xl font-bold z-10 text-main';
             numberText.textContent = value;
             dieFace.appendChild(svgIcon);
             dieFace.appendChild(numberText);
@@ -366,8 +638,8 @@
             const logText = `【${username}_${diceInfo}】: ${total} → ${resultString}`;
             historyData.push(logText);
             const entry = document.createElement('div');
-            entry.className = 'bg-gray-800/80 p-2 rounded-lg text-xs';
-            entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${username}</span><span class="text-amber-300"> ${languageData.system.rolled} ${diceInfo}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${resultString}</p></div><span class="text-2xl font-bold">${total}</span></div>`;
+            entry.className = 'bg-main p-2 rounded-lg text-xs';
+            entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-main">${username}</span><span class="text-highlight"> ${languageData.system.rolled} ${diceInfo}</span></p><p class="text-muted mt-1 text-xs break-all">${resultString}</p></div><span class="text-2xl font-bold text-main">${total}</span></div>`;
             historyLogContainer.prepend(entry);
         };
         
@@ -439,14 +711,12 @@
             element.addEventListener('contextmenu', (e) => e.preventDefault());
         };
         
-        // 開啟模態框函式
+        // 開啟/關閉模態框函式
         function openModal(playerId) {
             globalState.activePlayerIdForModal = playerId;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         };
-        
-        // 關閉模態框函式
         function closeModal() {
             modal.classList.remove('flex');
             modal.classList.add('hidden');
@@ -458,35 +728,34 @@
             Object.keys(dieSVGs).forEach(type => {
                 const button = document.createElement('button');
                 button.dataset.type = type;
-                button.className = 'aspect-square bg-gray-600 rounded-lg flex flex-col items-center justify-center p-2 active:bg-gray-500 transition-colors';
-                button.innerHTML = `<div class="w-8 h-8 text-amber-400">${dieSVGs[type]}</div><span class="font-bold mt-1">D${type}</span>`;
+                button.className = 'aspect-square bg-panel-light rounded-lg flex flex-col items-center justify-center p-2 active:bg-box transition-colors';
+                button.innerHTML = `<div class="w-8 h-8 text-highlight">${dieSVGs[type]}</div><span class="font-bold mt-1 text-main">D${type}</span>`;
                 diceTypeOptionsContainer.appendChild(button);
             });
         };
 
         // 渲染當前模式的 UI
         function renderUIForCurrentMode(isImport = false, switchingMode = false) {
-            const currentScrollTop = mainContentContainer.scrollTop; // 記錄滾動位置
+            const currentScrollTop = mainContentContainer.scrollTop;
 
-            mainContentContainer.innerHTML = ''; // 清空主內容區域
-            // 如果是切換模式（非導入），則重置歷史紀錄和玩家狀態
+            mainContentContainer.innerHTML = '';
             if (switchingMode) {
                 historyData = [];
                 playerStates = {};
             }
             
-            // 更新模式按鈕的樣式
+            // 更新模式按鈕樣式
             document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.remove('bg-amber-600', 'text-white');
-                btn.classList.add('bg-gray-700', 'text-gray-400');
+                btn.classList.remove('bg-btn', 'text-btn');
+                btn.classList.add('bg-box', 'text-muted');
             });
             const activeBtn = document.querySelector(`.mode-btn[data-mode="${currentMode}"]`);
             if (activeBtn) {
-                activeBtn.classList.add('bg-amber-600', 'text-white');
-                activeBtn.classList.remove('bg-gray-700', 'text-gray-400');
+                activeBtn.classList.add('bg-btn', 'text-btn');
+                activeBtn.classList.remove('bg-box', 'text-muted');
             }
 
-            // 更新所有靜態文字內容
+            // 更新靜態文字
             document.title = languageData.common.pageTitle;
             document.getElementById('tool-title').textContent = languageData.common.toolTitle;
             document.getElementById('single-mode-btn').textContent = languageData.common.singleMode;
@@ -495,25 +764,23 @@
             document.getElementById('made-by-link').textContent = languageData.common.madeBy;
             document.getElementById('modal-title').textContent = languageData.common.selectDieType;
 
-            // 根據模式渲染 UI
+            // 根據模式渲染
             switch (currentMode) {
                 case 'single':
                     mainContentContainer.className = 'flex-1 p-4 overflow-hidden';
-                    // 如果玩家狀態為空，則初始化單人玩家狀態
                     if (Object.keys(playerStates).length === 0) {
-                         playerStates = { 'player1': { name: languageData.singlePlayer.usernamePlaceholder.replace('...', '').trim(), dieType: 6, quantity: 1, sum: 0 } };
+                        playerStates = { 'player1': { name: '', dieType: 6, quantity: 1, sum: 0 } };
                     }
                     mainContentContainer.innerHTML = createSinglePlayerUI();
                     historyLogContainer = document.getElementById('history-log');
                     const nameInput = document.querySelector('[data-action="change-name"]');
                     nameInput.value = playerStates['player1'].name;
                     nameInput.placeholder = languageData.singlePlayer.usernamePlaceholder;
-                    setupPressAndHold(document.getElementById('dice-area-player1')); // 設置長按事件
+                    setupPressAndHold(document.getElementById('dice-area-player1'));
                     updateUI('player1');
                     break;
                 case 'multi':
                     mainContentContainer.className = 'flex-1 p-4 gap-4 grid grid-cols-3 grid-rows-2 overflow-hidden';
-                    // 如果玩家狀態為空，則初始化多個玩家狀態
                     if (Object.keys(playerStates).length === 0) {
                         playerStates = {
                             'gm': { name: languageData.multiPlayer.defaultGMName, dieType: 6, quantity: 7, sum: 0 },
@@ -534,88 +801,62 @@
                     
                     historyLogContainer = document.getElementById('history-log');
                     
-                    // 倒序填充歷史紀錄
                     historyData.slice().reverse().forEach(logText => {
                         const parts = logText.match(/【(.*?)_(.*?)】: (.*?) → (\[.*\])/);
                         if(!parts) return;
                         const entry = document.createElement('div');
-                        entry.className = 'bg-gray-800/80 p-2 rounded-lg text-xs';
-                        entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-white">${parts[1]}</span><span class="text-amber-300"> ${languageData.system.rolled} ${parts[2]}</span></p><p class="text-gray-400 mt-1 text-xs break-all">${parts[4]}</p></div><span class="text-2xl font-bold">${parts[3]}</span></div>`;
+                        entry.className = 'bg-main p-2 rounded-lg text-xs';
+                        entry.innerHTML = `<div class="flex justify-between items-start"><div class="flex-1 mr-2"><p class="font-bold break-words"><span class="text-main">${parts[1]}</span><span class="text-highlight"> ${languageData.system.rolled} ${parts[2]}</span></p><p class="text-muted mt-1 text-xs break-all">${parts[4]}</p></div><span class="text-2xl font-bold text-main">${parts[3]}</span></div>`;
                         historyLogContainer.append(entry);
                     });
 
                     playerIds.forEach(pId => {
                         const diceArea = document.getElementById(`dice-area-${pId}`);
-                        if (diceArea) setupPressAndHold(diceArea); // 設置長按事件
+                        if (diceArea) setupPressAndHold(diceArea);
                         updateUI(pId);
                         const nameInputMulti = document.querySelector(`#panel-${pId} [data-action="change-name"]`);
                         if(nameInputMulti) nameInputMulti.value = playerStates[pId].name;
                     });
                     break;
                 case 'docs':
-                    mainContentContainer.className = 'flex-1 p-4 overflow-y-auto';
+                    mainContentContainer.className = 'flex-1 overflow-hidden';
                     mainContentContainer.innerHTML = createDocsUI();
                     break;
             }
-            mainContentContainer.scrollTop = currentScrollTop; // 恢復滾動位置
+            mainContentContainer.scrollTop = currentScrollTop;
         };
 
         // 初始化應用程式
         function initializeApp() {
-            // 字體切換下拉選單事件
-            fontDropdownBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // 防止點擊按鈕時觸發 document 的點擊事件
-                fontDropdownMenu.classList.toggle('hidden');
-                langDropdownMenu.classList.add('hidden'); // 關閉語言選單
-            });
-            fontDropdownMenu.addEventListener('click', (e) => {
-                if (e.target.dataset.font) {
-                    playSound(buttonSound);
-                    setFont(e.target.dataset.font);
-                    fontDropdownMenu.classList.add('hidden');
-                }
-            });
+            // 載入 localStorage 設定
+            currentTheme = localStorage.getItem('theme') || 'dark';
+            currentLang = localStorage.getItem('language') || 'zh-TW';
+            currentFont = localStorage.getItem('font') || 'NotoSansTC';
+            diceSize = localStorage.getItem('diceSize') || 48;
+            globalState.isMuted = localStorage.getItem('isMuted') === 'true';
+            currentMode = localStorage.getItem('currentMode') || 'multi';
 
-            // 語言切換下拉選單事件
-            langDropdownBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // 防止點擊按鈕時觸發 document 的點擊事件
-                langDropdownMenu.classList.toggle('hidden');
-                fontDropdownMenu.classList.add('hidden'); // 關閉字體選單
-            });
-            langDropdownMenu.addEventListener('click', (e) => {
-                if (e.target.dataset.lang) {
-                    playSound(buttonSound);
-                    setLanguage(e.target.dataset.lang);
-                    langDropdownMenu.classList.add('hidden');
-                }
-            });
-
-            // 點擊頁面其他地方關閉下拉選單
-            document.addEventListener('click', (e) => {
-                if (langDropdownMenu && !langDropdownBtn.contains(e.target) && !langDropdownMenu.contains(e.target)) {
-                    langDropdownMenu.classList.add('hidden');
-                }
-                if (fontDropdownMenu && !fontDropdownBtn.contains(e.target) && !fontDropdownMenu.contains(e.target)) {
-                    fontDropdownMenu.classList.add('hidden');
-                }
-            });
+            // 設定事件監聽
+            settingsBtn.addEventListener('click', () => { playSound(buttonSound); settingsModal.classList.remove('hidden'); });
+            closeSettingsBtn.addEventListener('click', () => { playSound(buttonSound); settingsModal.classList.add('hidden'); });
+            settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) { playSound(buttonSound); settingsModal.classList.add('hidden'); } });
             
-            // 模式切換按鈕事件
+            themeSelect.addEventListener('change', (e) => { playSound(buttonSound); setTheme(e.target.value); });
+            languageSelect.addEventListener('change', (e) => { playSound(buttonSound); setLanguage(e.target.value); });
+            fontSelect.addEventListener('change', (e) => { playSound(buttonSound); setFont(e.target.value); });
+            soundToggleBtn.addEventListener('click', () => toggleMute());
+            diceSizeSlider.addEventListener('input', (e) => setDiceSize(e.target.value));
+
             singleModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'single') { currentMode = 'single'; localStorage.setItem('currentMode', currentMode); renderUIForCurrentMode(false, true); }});
             multiModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'multi') { currentMode = 'multi'; localStorage.setItem('currentMode', currentMode); renderUIForCurrentMode(false, true); }});
             docsModeBtn.addEventListener('click', () => { playSound(buttonSound); if(currentMode !== 'docs') { currentMode = 'docs'; localStorage.setItem('currentMode', currentMode); renderUIForCurrentMode(false, true); }});
             
-            // 音效開關按鈕事件
-            soundToggleBtn.addEventListener('click', () => { globalState.isMuted = !globalState.isMuted; localStorage.setItem('isMuted', globalState.isMuted); updateSoundToggleIcon(); if (!globalState.isMuted) playSound(buttonSound); });
-            
-            // 導入檔案輸入框事件
             importFileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) { importState(file); }
                 e.target.value = '';
             });
 
-            // 全局點擊事件處理
             document.body.addEventListener('click', (e) => {
                 const target = e.target.closest('[data-action]');
                 if (!target) return;
@@ -623,24 +864,20 @@
                 const action = target.dataset.action;
                 const playerId = target.dataset.player;
 
-                // 播放音效
                 if(['increase-qty', 'decrease-qty', 'clear-history', 'import-history'].includes(action)){
-                     playSound(buttonSound);
+                    playSound(buttonSound);
                 }
                 if(action === 'roll'){
                     playSound(buttonSound);
                     playRandomRollSound();
                 }
 
-                // 處理動作
                 switch(action) {
                     case 'import-history':
                         if (currentMode === 'multi') { importFileInput.click(); } 
                         else { alert(languageData.system.importForMultiOnly); }
                         break;
-                    case 'export-history':
-                        exportState();
-                        break;
+                    case 'export-history': exportState(); break;
                     case 'increase-qty': if (playerStates[playerId] && playerStates[playerId].quantity < globalState.maxQty) { playerStates[playerId].quantity++; updateUI(playerId); } break;
                     case 'decrease-qty': if (playerStates[playerId] && playerStates[playerId].quantity > globalState.minQty) { playerStates[playerId].quantity--; updateUI(playerId); } break;
                     case 'roll': if (playerStates[playerId]) rollDice(playerId); break;
@@ -648,7 +885,6 @@
                 }
             });
             
-            // 輸入框變更名稱事件
             document.body.addEventListener('input', (e) => {
                 const target = e.target.closest('[data-action="change-name"]');
                 if(target){
@@ -657,10 +893,8 @@
                 }
             });
             
-            // 模態框點擊外部關閉
             modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
             
-            // 骰子類型選項點擊事件
             diceTypeOptionsContainer.addEventListener('click', (e) => {
                 const button = e.target.closest('button');
                 if (button && button.dataset.type) {
@@ -674,17 +908,12 @@
                 }
             });
 
-            // 載入 localStorage 設定
-            globalState.isMuted = localStorage.getItem('isMuted') === 'true';
-            currentMode = localStorage.getItem('currentMode') || 'multi';
-            currentLang = localStorage.getItem('language') || 'zh-TW';
-            currentFont = localStorage.getItem('font') || 'NotoSansTC';
-
-            // 初始化各項功能
-            populateDiceOptions(); // 填充骰子選項
-            updateSoundToggleIcon(); // 設定初始音效圖示
-            setLanguage(currentLang); // 設定初始語言並渲染 UI
-            setFont(currentFont); // 設定初始字體
+            // 初始化
+            populateDiceOptions();
+            setTheme(currentTheme);
+            setFont(currentFont);
+            setDiceSize(diceSize);
+            setLanguage(currentLang);
         };
         
         initializeApp();
